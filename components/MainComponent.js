@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {Image} from 'react-native';
 import {Icon} from 'react-native-elements';
 import Home from './HomeComponent';
 import LocationSight from './LocationSight';
@@ -26,14 +27,20 @@ function ProfileNavigatorScreen() {
                 },
                 headerTintColor: "#fff",
                 headerTitleStyle: {
-                    color: "#fff"            
+                    color: "#fff"  ,
+                    textAlign: 'center',
+                    fontWeight: "bold",
+                    fontSize: 15                    
                 }
             }}
         >
             <ProfileNavigator.Screen
-                name="My Profile"
+                name="MY PROFILE"
                 component={Profile}
                 options={{headerTitle: "My Profile"},({navigation}) => ({
+                    headerLeft: () => (
+                        <Image source={require('./images/Logo.png')} style={{width: 75, height: 75}}/>
+                    ),
                     headerRight: () => (
                         <Icon 
                             name='user-alt'
@@ -60,14 +67,20 @@ function LocationSightNavigatorScreen() {
                 },
                 headerTintColor: "#fff",
                 headerTitleStyle: {
-                    color: "#fff"            
+                    color: "#fff"  ,
+                    textAlign: 'center',
+                    fontWeight: "bold",
+                    fontSize: 15                     
                 }
             }}
         >
             <LocationSightNavigator.Screen
-                name="Location Sight"
+                name="LOCATION SIGHT"
                 component={LocationSight}
                 options={{headerTitle: "Location Sight"},({navigation}) => ({
+                    headerLeft: () => (
+                        <Image source={require('./images/Logo.png')} style={{width: 75, height: 75}}/>
+                    ),
                     headerRight: () => (
                         <Icon 
                             name='globe' 
@@ -95,14 +108,20 @@ function RatificationNavigatorScreen() {
                 },
                 headerTintColor: "#fff",
                 headerTitleStyle: {
-                    color: "#fff"            
+                    color: "#fff"  ,
+                    textAlign: 'center',
+                    fontWeight: "bold",
+                    fontSize: 15                      
                 }
             }}
         >
             <RatificationNavigator.Screen
-                name="Ratification"
+                name="RATIFICATION"
                 component={Ratification}
                 options={{headerTitle: "Ratification"},({navigation}) => ({
+                    headerLeft: () => (
+                        <Image source={require('./images/Logo.png')} style={{width: 75, height: 75}}/>
+                    ),
                     headerRight: () => (
                         <Icon 
                             name='check-circle' 
@@ -131,14 +150,20 @@ function SpecieSightNavigatorScreen() {
                 },
                 headerTintColor: "#fff",
                 headerTitleStyle: {
-                    color: "#fff"            
+                    color: "#fff" ,
+                    textAlign: 'center',
+                    fontWeight: "bold",
+                    fontSize: 15                     
                 }
             }}
         >
             <SpecieSightNavigator.Screen
-                name="Specie Sight"
+                name="SPECIE SIGHT"
                 component={SpecieSight}
                 options={{headerTitle: "Specie Sight"},({navigation}) => ({
+                    headerLeft: () => (
+                        <Image source={require('./images/Logo.png')} style={{width: 75, height: 75}}/>
+                    ),
                     headerRight: () => (
                         <Icon 
                             name='dove' 
@@ -166,14 +191,20 @@ function HomeNavigatorScreen() {
                 },
                 headerTintColor: "#fff",
                 headerTitleStyle: {
-                    color: "#fff"            
+                    color: "#fff",
+                    textAlign: 'center',
+                    fontWeight: "bold",
+                    fontSize: 15            
                 }
             }}
         >
             <HomeNavigator.Screen
-                name="Home"
+                name="HOME"
                 component={Home}
                 options={{headerTitle: "Home"},({navigation}) => ({
+                    headerLeft: () => (
+                        <Image source={require('./images/Logo.png')} style={{width: 75, height: 75}}/>
+                    ),
                     headerRight: () => (
                         <Icon 
                             name='home' 

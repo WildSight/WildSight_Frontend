@@ -10,7 +10,7 @@ class Home extends Component {
         return (
             <View>
                 <Text>This is HomeNavigator component.</Text>
-                <StatusBar barStyle = "dark-content" hidden = {false} backgroundColor = "#065446" translucent = {true}/>
+                <StatusBar barStyle = "light-content" hidden = {false} backgroundColor = "#065446" translucent = {true}/>
             </View>
         );
     }
