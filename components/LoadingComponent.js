@@ -1,16 +1,30 @@
-import React, {Component} from 'react';
-import { View, Image, ImageBackground, Text, StyleSheet} from 'react-native';
+import React from 'react';
+import {
+    ActivityIndicator,
+    StyleSheet,
+    Text,
+    View,
+  } from 'react-native'
 
+const styles = StyleSheet.create({
+    loadingView: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      flex: 1,
+      backgroundColor: 'white'
+    },
+    loadingText: {
+        color: '#158467',
+        fontSize: 14,
+        fontWeight: 'bold'
+      }
+});
 
-class Loading extends Component {
-
-    render() {
-        return (
-            <View>
-                <Text>This is Loading component.</Text>
-            </View>
-        );
-    }
-}
-
-export default Loading; 
+export const Loading = ({text}) => {
+    return(
+        <View style={styles.loadingView} >
+            <ActivityIndicator size="large" color="#158467" />
+            <Text style={styles.loadingText}>{text}</Text>
+        </View>
+    );
+};

@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
-import { View, Image, ImageBackground, Alert, Text, StyleSheet, ScrollView, FlatList, ToastAndroid, Platform, SafeAreaView, Dimensions} from 'react-native';
+import { View, Alert, Text, ImageBackground, StyleSheet, Linking, FlatList, ToastAndroid, Platform, SafeAreaView, Dimensions} from 'react-native';
 import {ListItem, Icon, BottomSheet, Button, Card, Avatar} from 'react-native-elements';
 import MapView, {Marker} from 'react-native-maps';
+import {Loading} from './LoadingComponent';
+import {Picker} from 'native-base';
+import * as IntentLauncher from 'expo-intent-launcher';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
@@ -21,42 +24,69 @@ const data = [
 
 ];
 
+const monthNames = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+
+const d = new Date();
+
 class LocationSight extends Component {
 
     constructor(props){
         super(props);
 
         this.state={
+            month: monthNames[d.getMonth()],
             sheetVisible: false,
             errorMsg: null,
             latitude: 37.78825,
-            longitude: -122.4324
+            longitude: -122.4324,
+            location: null,
+        }
+    }
+
+    onMonthValueChange(value) {
+        this.setState({
+          month: value
+        });
+    }
+
+    openSettingApp = () => {
+        if(Platform.OS==='ios'){
+            Linking.openURL('app-settings:');
+        }
+        else{
+            IntentLauncher.startActivityAsync(IntentLauncher.ACTION_LOCATION_SOURCE_SETTINGS);
         }
     }
 
     getLoction = async () => {
-        let {status} = await Permissions.askAsync(Permissions.LOCATION);
 
-        if(status !== 'granted'){
+            let {status} = await Permissions.askAsync(Permissions.LOCATION);
+
+            if(status !== 'granted'){
+                this.setState({
+                    errorMsg: 'Permission to access location is denied!'
+                })
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+
             this.setState({
-                errorMsg: 'Permission to access location is denied!'
+                location: location
+            });
+
+            if(this.state.errorMsg){
+                Alert(this.state.errorMsg);
+                return;
+            }
+
+            var loc = JSON.parse(JSON.stringify(location));
+            this.setState({
+                latitude: loc.coords.latitude,
+                longitude: loc.coords.longitude
             })
-        }
-
-        let location = await Location.getCurrentPositionAsync({});
-
-        if(this.state.errorMsg){
-            Alert(this.state.errorMsg);
-            return;
-        }
-
-        var loc = JSON.parse(JSON.stringify(location));
-        this.setState({
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude
-        })
-
-        console.log(this.state.location)
+        
     }
 
     componentDidMount(){
@@ -69,7 +99,6 @@ class LocationSight extends Component {
           }
         else 
           this.getLoction();
-        ToastAndroid.show("Fetching species commonly found in your current region!!", ToastAndroid.LONG);
     }
 
     render() {
@@ -96,12 +125,11 @@ class LocationSight extends Component {
             return(
 
                 <ListItem
-    
                     key={index}
                     containerStyle={{
                         backgroundColor: color,
-                        height: 100, borderRadius: 25, marginHorizontal: '3%', 
-                        marginTop: '5%'}}
+                        height: 100, borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
+                        marginTop: '3%'}}
                     pad = {30}
                 >   
                     <Avatar rounded size={'large'} source={require("./images/sparrow.jpg")} icon={{name: 'user', type: 'font-awesome'}}/>
@@ -134,8 +162,51 @@ class LocationSight extends Component {
 
         let screenHeight = 2*Dimensions.get('window').height;
 
+        if(this.state.location){
+        
         return (
-            <ScrollView>
+            <View style={styles.container}>
+                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
+                <SafeAreaView style={{flex: 1}}>
+                    <BottomSheet isVisible={this.state.sheetVisible} >
+                        <View style={{flex: 1, backgroundColor: 'white'}}>
+                        <Text style={{textAlign: 'right', marginBottom: '0%'}}>
+                            <Icon 
+                                name='times-circle'
+                                type='font-awesome-5' 
+                                onPress={() => this.setState({sheetVisible: !this.state.sheetVisible})}
+                                size={30}
+                                />
+                            </Text>
+                        <MapView 
+                            region={{
+                                latitude: this.state.latitude,
+                                longitude: this.state.longitude,
+                                latitudeDelta: 0.005,
+                                longitudeDelta: 0.005
+                            }}
+                            style={{height: screenHeight-500, width: Dimensions.get('window').width}}
+                        >
+                            <Marker 
+                                coordinate={{
+                                    latitude: this.state.latitude,
+                                    longitude: this.state.longitude
+                                }}
+                                image={require('./images/Logo.png')}
+                                title={'Current Location'}
+                            />
+                        </MapView>
+                        </View>
+                    </BottomSheet>
+                    
+                    <FlatList
+                        data={data.sort((s1, s2) => s2.sightings-s1.sightings)}
+                        renderItem={renderListItem}
+                        keyExtractor={item => item.id.toString()}
+                        style={{marginBottom: 30}}
+                        />  
+                    
+                </SafeAreaView>
                 <Button
                     onPress={() => this.setState({sheetVisible: !this.state.sheetVisible})}
                     title='SEE YOUR CURRENT GRID'
@@ -149,52 +220,66 @@ class LocationSight extends Component {
                     }
                     buttonStyle={{
                         backgroundColor: "#fa4659",
-                        borderRadius: 10
                     }}
                     titleStyle={{padding: 20}}
-                    containerStyle={{margin: 20, marginBottom: 0}}
+                    containerStyle={{margin: 20, marginTop: 0}}
                     raised
                     />
-                <BottomSheet isVisible={this.state.sheetVisible} >
-                    <View style={{flex: 1, backgroundColor: 'white'}}>
-                    <Text style={{textAlign: 'right', marginBottom: '0%'}}>
-                        <Icon 
-                            name='times-circle'
-                            type='font-awesome-5' 
-                            onPress={() => this.setState({sheetVisible: !this.state.sheetVisible})}
-                            size={30}
-                            />
-                        </Text>
-                    <MapView 
-                        region={{
-                            latitude: this.state.latitude,
-                            longitude: this.state.longitude,
-                            latitudeDelta: 0.005,
-                            longitudeDelta: 0.005
-                        }}
-                        style={{height: screenHeight-500, width: Dimensions.get('window').width}}
+                <View style={{height: '10%'}}>
+                    <Picker
+                        style={{marginHorizontal: 20}}
+                        itemStyle={{fontWeight: 'bold'}}
+                        selectedValue={this.state.month}
+                        onValueChange={this.onMonthValueChange.bind(this)}
                     >
-                        <Marker 
-                            coordinate={{
-                                latitude: this.state.latitude,
-                                longitude: this.state.longitude
-                            }}
-                            image={require('./images/Logo.png')}
-                            title={'Current Location'}
-                        />
-                    </MapView>
-                    </View>
-                </BottomSheet>
-                
-                <FlatList
-                    data={data.sort((s1, s2) => s2.sightings-s1.sightings)}
-                    renderItem={renderListItem}
-                    keyExtractor={item => item.id.toString()}
-                    style={{marginBottom: 30}}
-                    />  
-            </ScrollView>
+                        <Picker.Item label="January" value="January" />
+                        <Picker.Item label="February" value="February" />
+                        <Picker.Item label="March" value="March" />
+                        <Picker.Item label="April" value="April" />
+                        <Picker.Item label="May" value="May" />
+                        <Picker.Item label="June" value="June" />
+                        <Picker.Item label="July" value="July" />
+                        <Picker.Item label="August" value="August" />
+                        <Picker.Item label="September" value="September" />
+                        <Picker.Item label="October" value="October" />
+                        <Picker.Item label="November" value="November" />
+                        <Picker.Item label="December" value="December" />
+                    </Picker>
+                </View>
+                </ImageBackground>
+            </View>
         );
+        }
+        else
+        {   
+            return(
+                <View style={styles.container}>
+                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
+                    <Loading text={'Getting Your Current Location ..... \n\n Location Services Must be ON'} />
+                </ImageBackground>
+            </View>
+            );
+        }
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        flexDirection: "column"
+      },
+      image: {
+        flex: 1,
+        resizeMode: "cover",
+        justifyContent: "center"
+      },
+      text: {
+        color: "white",
+        fontSize: 42,
+        fontWeight: "bold",
+        textAlign: "center",
+        backgroundColor: "#000000a0"
+      }
+});
 
 export default LocationSight; 
