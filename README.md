@@ -7,3 +7,9 @@
 <h6>5. Then install EXPO app from google playstore https://play.google.com/store/apps/details?id=host.exp.exponent&hl=en_IN&gl=US . </h6>
 <h6>6. Go to cloned repository folder and type "expo start" in cmd. This will open another tab in your browser there SCAN the QR code from EXPO APP you just  installed, and you are now ready to test our APP.</h6>
 <h6>7. For instance change a code little bit in App.js file and press ctrl+s this will automatically hotreload the expo app and you will see the changes you made in real time.</h6>
+<h6>8. To use react developer tools run
+    <code>npm run react-devtools</code>
+</h6><br/>
+It will open react dev tools by default if you are running app on an emulator. <br/>
+Otherwise, you need to run <code>adb reverse tcp:8097 tcp:8097</code> <br/>
+For more details, regarding developer tools, you can refer https://www.npmjs.com/package/react-devtools
