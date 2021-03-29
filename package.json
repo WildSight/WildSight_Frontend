@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "3.0.4",
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/bottom-tabs": "^5.11.8",
     "@react-navigation/drawer": "^5.12.4",
@@ -15,10 +16,12 @@
     "@react-navigation/stack": "^5.14.3",
     "expo": "~40.0.0",
     "expo-constants": "~9.3.3",
+    "expo-image-picker": "~9.2.0",
     "expo-intent-launcher": "~8.4.0",
     "expo-location": "~10.0.0",
     "expo-permissions": "~10.0.0",
     "expo-status-bar": "~1.0.3",
+    "moment": "^2.29.1",
     "native-base": "^2.15.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",

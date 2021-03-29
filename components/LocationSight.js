@@ -77,7 +77,7 @@ class LocationSight extends Component {
             });
 
             if(this.state.errorMsg){
-                Alert(this.state.errorMsg);
+                Alert.alert(null, this.state.errorMsg);
                 return;
             }
 
@@ -254,10 +254,10 @@ class LocationSight extends Component {
         {   
             return(
                 <View style={styles.container}>
-                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
-                    <Loading text={'Getting Your Current Location ..... \n\n Location Services Must be ON'} />
-                </ImageBackground>
-            </View>
+                    <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
+                        <Loading text={'Getting Your Current Location ..... \n\n Location Services Must be ON'} />
+                    </ImageBackground>
+                </View>
             );
         }
     }

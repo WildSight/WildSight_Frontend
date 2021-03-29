@@ -11,10 +11,10 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       flex: 1,
-      backgroundColor: 'white'
+      // backgroundColor: "#00000099"
     },
     loadingText: {
-        color: '#158467',
+        color: 'white',
         fontSize: 14,
         fontWeight: 'bold'
       }
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 export const Loading = ({text}) => {
     return(
         <View style={styles.loadingView} >
-            <ActivityIndicator size="large" color="#158467" />
+            <ActivityIndicator size="large" color="white" />
             <Text style={styles.loadingText}>{text}</Text>
         </View>
     );

@@ -9,6 +9,7 @@ import LocationSight from './LocationSight';
 import Profile from './ProfileComponent';
 import Ratification from './Ratification';
 import SpecieSight from './SpecieSight';
+import AddSighting from './AddSighting';
 
 const Tab = createBottomTabNavigator();
 
@@ -218,6 +219,11 @@ function HomeNavigatorScreen() {
                     )
 
                 })}
+            />
+            <HomeNavigator.Screen
+                name="ADD SIGHTING"
+                component={AddSighting}
+                options= {{ headerTitle: "ADD SIGHTING", headerTitleStyle: {textAlign: 'left', fontWeight: 'bold'}}}
             />
         </HomeNavigator.Navigator>
     );
