@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import { View, Image, StatusBar, ImageBackground, Text, StyleSheet} from 'react-native';
+import { View, RefreshControl, Image, StatusBar, ImageBackground, Text, StyleSheet} from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 import {Loading} from './LoadingComponent';
+import PTRView from 'react-native-pull-to-refresh';
 
 class Home extends Component {
 
@@ -10,7 +11,27 @@ class Home extends Component {
         super(props);
         this.state={
             birdFact: "",
+            refreshing: false
         }
+    }
+
+    onRefresh = async () => {
+        this.setState({
+            refreshing: true
+        });
+
+        await fetch('https://some-random-api.ml/facts/Bird')
+        .then(res => res.json())
+        .then(fact => this.setState({
+            birdFact: fact.fact
+        }))
+        .catch(() => this.setState({
+            birdFact: "Can't Fetch BirdoFact :("
+        }));
+
+        this.setState({
+            refreshing: false
+        });
     }
 
     componentDidMount(){
@@ -46,7 +67,19 @@ class Home extends Component {
         }
 
         return (
-            <View style={styles.container}>
+            <View style={styles.container} >
+                <View style={{height:'5%', zIndex: 1}}>
+                    <ScrollView
+                        contentContainerStyle={styles.scrollView}
+                        refreshControl={
+                            <RefreshControl 
+                                refreshing={this.state.refreshing}
+                                onRefresh={() => this.onRefresh()}
+                            />
+                        }
+                    >
+                    </ScrollView>
+                </View>
                 <StatusBar barStyle = "light-content" hidden = {false} backgroundColor = "#065446" translucent = {true}/>
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                     <View style={{height:'100%', backgroundColor: "#00000099"}}>
@@ -104,10 +137,11 @@ class Home extends Component {
 }
 
 const styles = StyleSheet.create({
-    container: {
+
+    container:{
         flex: 1,
-        flexDirection: "column"
-      },
+        flexDirection: 'column'
+    },
       image: {
         flex: 1,
         resizeMode: "cover",
@@ -128,7 +162,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         textAlignVertical: 'center',
         flex: 0.2,
-        marginTop: '10%'
+
       },
       name: {
         flex: 1,
@@ -142,7 +176,13 @@ const styles = StyleSheet.create({
       section: {
         flex: 1,
         textAlign: "center",
-      }
+      },
+      scrollView: {
+        flex: 1,
+        backgroundColor: '#00000099',
+        //alignItems: 'center',
+        //justifyContent: 'center',
+      },
 });
 
 export default Home; 
