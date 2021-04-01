@@ -22,7 +22,7 @@ export async function getImageFromCamera(width, height){
                 blob: Blob
             };
             return SelectedImage
-        }else return null
+        }
     }else{
         return{error:"Permission Denied"}
     }
@@ -61,15 +61,21 @@ export function openSettingApp() {
     }
 }
 
-export async function getLoction(){
+export async function getUserLoction(){
+    try{
+        let {status} = await Permissions.askAsync(Permissions.LOCATION);
 
-    let {status} = await Permissions.askAsync(Permissions.LOCATION);
+        if(status === 'granted'){
+            let location = await Location.getCurrentPositionAsync({});
+            return location
+        }
 
-    if(status !== 'granted'){
+    }catch(e){
         return {
             error: 'Permission to access location is denied!'
         }
     }
-    let location = await Location.getCurrentPositionAsync({});
-    return location
+
+    
+    
 }

@@ -8,6 +8,8 @@ import * as IntentLauncher from 'expo-intent-launcher';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import Moment from 'moment';
+import {openSettingApp, getImageFromGallery, getImageFromCamera, getUserLoction} from './commonComponents/permissions';
+
 
 var width = Dimensions.get('window').width;
 var heigth = Math.floor(Dimensions.get('window').height/3);
@@ -54,96 +56,62 @@ class AddSighting extends Component {
         Alert.alert("Form Submitted", JSON.stringify(Sighting));
     }
 
-    getImageFromCamera = async () => {
-        const cameraPermission = await Permissions.askAsync(Permissions.CAMERA);
-        const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-
-        if (cameraPermission.status === 'granted' && cameraRollPermission.status === 'granted') {
-            let capturedImage = await ImagePicker.launchCameraAsync({
-                allowsEditing: true,
-                
-                aspect: [width, heigth],
-            });
-            if (!capturedImage.cancelled) {
-                console.log(capturedImage);
-                var image = await fetch(capturedImage.uri);
-                var Blob = await image.blob();
-
+    getCameraImage= async()=>{
+        var selectedImage= await getImageFromCamera(width, heigth);
+        if(selectedImage){
+            if(!selectedImage.error){
                 this.setState({
-                    imageUrl: capturedImage.uri,
-                    blob: Blob
+                    imageUrl: selectedImage.imageUrl,
+                    blob: selectedImage.blob
                 });
+    
+            }else{
+                console.log("Error", selectedImage.error);
             }
+        }else{
+            console.log("Image not selected");
         }
-
     }
-
-    getImageFromGallery = async () => {
-        const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-
-        if(cameraRollPermission.status === 'granted') {
-            let selectedImage = await ImagePicker.launchImageLibraryAsync({
-                allowsEditing: true,
-                aspect: [width, heigth]
-            })
-            if(!selectedImage.cancelled) {
-                console.log(selectedImage);
-                var image = await fetch(selectedImage.uri);
-                var Blob = await image.blob();
-
+    
+    getGalleryImage = async () => {
+        var selectedImage  = await getImageFromGallery(width, heigth);
+        if(selectedImage){
+            if(!selectedImage.error){
                 this.setState({
-                    imageUrl: selectedImage.uri,
-                    blob: Blob
+                    imageUrl: selectedImage.imageUrl,
+                    blob: selectedImage.blob
                 });
+    
+            }else{
+                console.log("Error", selectedImage.error);
             }
+        }else{
+            console.log("Image not selected");
         }
+        
     }
 
-    openSettingApp = () => {
-        if(Platform.OS==='ios'){
-            Linking.openURL('app-settings:');
-        }
-        else{
-            IntentLauncher.startActivityAsync(IntentLauncher.ACTION_LOCATION_SOURCE_SETTINGS);
-        }
-    }
-
-    getLoction = async () => {
-
-            let {status} = await Permissions.askAsync(Permissions.LOCATION);
-
-            if(status !== 'granted'){
-                this.setState({
-                    errorMsg: 'Permission to access location is denied!'
-                })
-            }
-
-            let location = await Location.getCurrentPositionAsync({});
-
+    getLoction = async ()=>{
+        let location = await getUserLoction();
+        if(location.error){
             this.setState({
-                location: location
-            });
-
-            if(this.state.errorMsg){
-                Alert.alert(null, this.state.errorMsg);
-                return;
-            }
-
-            var loc = JSON.parse(JSON.stringify(location));
-            this.setState({
-                latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude
+                errorMsg: location.error
             })
-            
-            this.setState({
-                locCoords: this.state.latitude.toString()+" "+this.state.longitude.toString()
-            })
-    }
+            Alert.alert(null, location.error);
+            return;
+        }
 
+        let loc = JSON.parse(JSON.stringify(location));
+        let latitude = loc.coords.latitude;
+        let longitude = loc.coords.longitude
+        this.setState({
+            latitude,longitude,
+            locCoords:latitude.toString()+" "+longitude.toString()
+        })
+    }
 
     render() {
 
-        
         return (
             <ScrollView style={{flex: 1}}>
                 <View style={{alignItems: 'center'}}>
@@ -157,7 +125,7 @@ class AddSighting extends Component {
                     <View style={{width: '45%', height: 100, paddingRight: '2%'}}>
                         <Button
                             title="Camera"
-                            onPress={this.getImageFromCamera}
+                            onPress={this.getCameraImage}
                             buttonStyle={{backgroundColor: '#85603f', borderRadius: 28}}
                             titleStyle={{color: "white", fontWeight: "bold", paddingHorizontal: '5%'}}
                         />
@@ -165,7 +133,7 @@ class AddSighting extends Component {
                     <View style={{width: '45%', height: 100, paddingLeft: '2%'}}>
                         <Button
                             title="Gallery"
-                            onPress={this.getImageFromGallery}
+                            onPress={this.getGalleryImage}
                             buttonStyle={{backgroundColor: '#85603f', borderRadius: 28}}
                             titleStyle={{color: "white", fontWeight: "bold", paddingHorizontal: '5%'}}
                         />
