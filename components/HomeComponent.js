@@ -68,7 +68,7 @@ class Home extends Component {
 
         return (
             <View style={styles.container} >
-                <View style={{height:'5%', zIndex: 1}}>
+                <View style={{height: '5%', zIndex: 1}}>
                     <ScrollView
                         contentContainerStyle={styles.scrollView}
                         refreshControl={
