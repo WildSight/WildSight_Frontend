@@ -10,7 +10,7 @@ class Home extends Component {
         super(props);
         this.state={
             birdFact: "",
-            loggedIn:false
+            loggedIn:true
         }
     }
 
