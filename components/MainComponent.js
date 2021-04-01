@@ -10,7 +10,8 @@ import Profile from './ProfileComponent';
 import Ratification from './Ratification';
 import SpecieSight from './SpecieSight';
 import AddSighting from './AddSighting';
-
+import Register from './forms/RegisterComponent'
+import Login from './forms/LoginComponent'
 const Tab = createBottomTabNavigator();
 
 const ProfileNavigator = createStackNavigator();
@@ -225,9 +226,22 @@ function HomeNavigatorScreen() {
                 component={AddSighting}
                 options= {{ headerTitle: "ADD SIGHTING", headerTitleStyle: {textAlign: 'left', fontWeight: 'bold'}}}
             />
+            <HomeNavigator.Screen
+                name="REGISTER USER"
+                component={Register}
+                options= {{ headerTitle: "REGISTER USER", headerTitleStyle: {textAlign: 'left', fontWeight: 'bold'}}}
+            />
+
+            <HomeNavigator.Screen
+                name="LOGIN USER"
+                component={Login}
+                options= {{ headerTitle: "LOGIN USER", headerTitleStyle: {textAlign: 'left', fontWeight: 'bold'}}}
+            />
         </HomeNavigator.Navigator>
     );
 }
+
+
 
 class Main extends Component {
 
@@ -324,6 +338,7 @@ class Main extends Component {
                     }}
                     >
                 </Tab.Screen>
+                
             </Tab.Navigator>          
         </NavigationContainer>
     );

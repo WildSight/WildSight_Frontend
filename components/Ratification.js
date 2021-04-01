@@ -18,8 +18,7 @@ class Ratification extends Component {
         return (
             <View style={styles.container}>
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
-                    <View style={styles.background}>
-                      <View>
+                      <View style={{height:'100%', backgroundColor: "#000000aa"}}>
                         {/* <Text style={styles.text}>Ratification Screen</Text> */}
                         <FlatList
                         data={data}
@@ -28,8 +27,6 @@ class Ratification extends Component {
                         style={{marginBottom: 30}}
                         /> 
                       </View>
-                    </View>
-                    
                 </ImageBackground>
             </View>
         );
@@ -45,11 +42,6 @@ const styles = StyleSheet.create({
         flex: 1,
         resizeMode: "cover",
         justifyContent: "center",
-      },
-      background:{
-        flex: 1,
-        resizeMode: "cover",
-        backgroundColor:"rgba(0,0,0,0.8)"
       },
       text: {
         color: "white",
