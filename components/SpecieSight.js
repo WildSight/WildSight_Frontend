@@ -50,20 +50,9 @@ class SpecieSight extends Component {
         }
     }
 
-    componentDidMount(){
-        this.refreshList();
-    }
+    
 
-    refreshList = () => {
-        axios
-          //.get("http://127.0.0.1:8000/api/Species/")
-          .get("http://192.168.43.185/api/Species/")
-          .then((res) => {
-              this.setState({ birds: res.data });
-              console.log(res.data);
-            })
-          .catch((err) => console.log(err));
-      };
+    
 
     search(){
 
