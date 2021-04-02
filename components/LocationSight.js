@@ -185,6 +185,7 @@ class LocationSight extends Component {
                                 latitudeDelta: 0.005,
                                 longitudeDelta: 0.005
                             }}
+                            onLongPress={(e) => console.log(e.nativeEvent)}
                             style={{height: screenHeight-500, width: Dimensions.get('window').width}}
                         >
                             <Marker 

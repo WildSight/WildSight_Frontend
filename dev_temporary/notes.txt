@@ -27,9 +27,20 @@ Profile Page:
         e.2) Number of sightings -- total of that bird in that area
         e.3) Area
 
+Register
+    a) Name
+    b) email
+    c) Password
+    d) Image
+
 
 
 
 
 Proposals:
     a) Adding some darker layer on owl, or some other background image -> to increase visibility/readibility of main content
+
+
+Things to check:
+    a)Can't find variable: setErrorMsg in LocationSight component. (where we are setting error due to use of emulator)
+    b) Converting ratification to Card component.

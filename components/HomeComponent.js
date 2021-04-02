@@ -11,7 +11,8 @@ class Home extends Component {
         super(props);
         this.state={
             birdFact: "",
-            refreshing: false
+            refreshing: false,
+            loggedIn:true
         }
     }
 
@@ -84,10 +85,57 @@ class Home extends Component {
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                     <View style={{height:'100%', backgroundColor: "#00000099"}}>
                         <Text style={styles.wish}>{wish}</Text>
-                        <Text style={styles.name}>Bhavesh Kumar</Text>
+                        <Text style={styles.name}>{this.state.loggedIn&&"Bhavesh Kumar" ||"Welcome to Wildsight"} </Text>
+                        
                         <View style={styles.section}>
                             <View style={{paddingTop: '15%'}}>
-                            <Button
+                            {/* -------------------------------------------------- */}
+                            {/* If user not logged In */}
+                            
+                            {!(this.state.loggedIn) && <>
+                                <Button
+                                onPress={() => this.props.navigation.navigate('REGISTER USER')}
+                                title='Register User'
+                                icon={
+                                    <Icon
+                                        name='user-plus'
+                                        type='font-awesome-5'            
+                                        size={24}
+                                        color= 'white'
+                                    />
+                                }
+                                buttonStyle={{
+                                    backgroundColor: "#fa4659",
+                                    borderRadius: 20
+                                }}
+                                titleStyle={{padding: 20, fontWeight: 'bold'}}
+                                containerStyle={{marginHorizontal: '15%', marginTop:'5%', marginBottom:'2%'}}
+                            />
+
+                            <Button onPress={() => this.props.navigation.navigate('LOGIN USER')}
+                                title='LOGIN'
+                                icon={
+                                    <Icon
+                                        name='sign-in-alt'
+                                        type='font-awesome-5'            
+                                        size={24}
+                                        color= 'white'
+                                    />
+                                }
+                                buttonStyle={{
+                                    backgroundColor: "#fa4659",
+                                    borderRadius: 20
+                                }}
+                                titleStyle={{padding: 20, fontWeight: 'bold'}}
+                                containerStyle={{marginHorizontal: '15%', marginTop:'7%'}}
+                            
+                            />
+                            </>
+                            }
+
+                        {/* -------------------------------------------------- */}
+                            {/*If logged in*/}
+                            {(this.state.loggedIn) &&<><Button
                                 onPress={() => this.props.navigation.navigate('ADD SIGHTING')}
                                 title='ADD SIGHTING'
                                 icon={
@@ -103,7 +151,7 @@ class Home extends Component {
                                     borderRadius: 20
                                 }}
                                 titleStyle={{padding: 20, fontWeight: 'bold'}}
-                                containerStyle={{marginHorizontal: '15%'}}
+                                containerStyle={{marginHorizontal: '15%', marginTop:'5%', marginBottom:'2%'}}
                             />
                             <Button
                                 title='LOGOUT'
@@ -123,6 +171,9 @@ class Home extends Component {
                                 containerStyle={{marginHorizontal: '15%', marginTop:'7%'}}
                             
                             />
+                            </>}
+                            {/* -------------------------------------------------- */}
+
                             </View>
                             
                         </View>

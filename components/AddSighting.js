@@ -1,16 +1,15 @@
 import React, {Component} from 'react';
-import { View, ScrollView, Text, Alert, Dimensions, TouchableOpacity} from 'react-native';
-import { Button, Image, Input, Icon} from 'react-native-elements';
-import * as Permissions from 'expo-permissions';
-import * as ImagePicker from 'expo-image-picker';
+import { View, ScrollView, Text, Alert, Dimensions, TouchableOpacity, ToastAndroid} from 'react-native';
+import { Button, Image, Input, Icon, BottomSheet} from 'react-native-elements';
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as IntentLauncher from 'expo-intent-launcher';
-import Constants from 'expo-constants';
-import * as Location from 'expo-location';
 import Moment from 'moment';
+import MapView, {Marker} from 'react-native-maps';
+import {openSettingApp, getImageFromGallery, getImageFromCamera, getUserLoction} from './commonComponents/permissions';
+
 
 var width = Dimensions.get('window').width;
 var heigth = Math.floor(Dimensions.get('window').height/3);
+let screenHeight = 2*Dimensions.get('window').height;
 
 class AddSighting extends Component {
 
@@ -18,10 +17,11 @@ class AddSighting extends Component {
         super(props);
         
         this.state={
+            sheetVisible: false,
             imageUrl: 'abc.png',
             blob: null,
             name: '',
-            locCoords: 'Getting Current Location..',
+            locCoords: 'Enter Current or Custom Location..',
             birdCount: '',
             date: new Date(),
             time: new Date(),
@@ -31,13 +31,13 @@ class AddSighting extends Component {
             duration: '',
             dateString: '',
             errorMsg: null,
-            latitude: 37.78825,
-            longitude: -122.4324,
+            latitude: 30.73629,
+            longitude:  76.7884,
             location: null,
         }
     }
 
-    componentDidMount(){
+    /*componentDidMount(){
 
         if (Platform.OS === 'android' && !Constants.isDevice) {
             setErrorMsg(
@@ -47,103 +47,87 @@ class AddSighting extends Component {
           }
         else 
           this.getLoction();
-    }
+    }*/
 
     handleSubmit = (Sighting) => {
 
         Alert.alert("Form Submitted", JSON.stringify(Sighting));
     }
 
-    getImageFromCamera = async () => {
-        const cameraPermission = await Permissions.askAsync(Permissions.CAMERA);
-        const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-
-        if (cameraPermission.status === 'granted' && cameraRollPermission.status === 'granted') {
-            let capturedImage = await ImagePicker.launchCameraAsync({
-                allowsEditing: true,
-                
-                aspect: [width, heigth],
-            });
-            if (!capturedImage.cancelled) {
-                console.log(capturedImage);
-                var image = await fetch(capturedImage.uri);
-                var Blob = await image.blob();
-
+    getCameraImage= async()=>{
+        var selectedImage= await getImageFromCamera(width, heigth);
+        if(selectedImage){
+            if(!selectedImage.error){
                 this.setState({
-                    imageUrl: capturedImage.uri,
-                    blob: Blob
+                    imageUrl: selectedImage.imageUrl,
+                    blob: selectedImage.blob
                 });
+    
+            }else{
+                console.log("Error", selectedImage.error);
             }
+        }else{
+            console.log("Image not selected");
         }
-
     }
-
-    getImageFromGallery = async () => {
-        const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-
-        if(cameraRollPermission.status === 'granted') {
-            let selectedImage = await ImagePicker.launchImageLibraryAsync({
-                allowsEditing: true,
-                aspect: [width, heigth]
-            })
-            if(!selectedImage.cancelled) {
-                console.log(selectedImage);
-                var image = await fetch(selectedImage.uri);
-                var Blob = await image.blob();
-
+    
+    getGalleryImage = async () => {
+        var selectedImage  = await getImageFromGallery(width, heigth);
+        if(selectedImage){
+            if(!selectedImage.error){
                 this.setState({
-                    imageUrl: selectedImage.uri,
-                    blob: Blob
+                    imageUrl: selectedImage.imageUrl,
+                    blob: selectedImage.blob
                 });
+    
+            }else{
+                console.log("Error", selectedImage.error);
             }
+        }else{
+            console.log("Image not selected");
         }
+        
     }
 
-    openSettingApp = () => {
-        if(Platform.OS==='ios'){
-            Linking.openURL('app-settings:');
-        }
-        else{
-            IntentLauncher.startActivityAsync(IntentLauncher.ACTION_LOCATION_SOURCE_SETTINGS);
-        }
-    }
-
-    getLoction = async () => {
-
-            let {status} = await Permissions.askAsync(Permissions.LOCATION);
-
-            if(status !== 'granted'){
-                this.setState({
-                    errorMsg: 'Permission to access location is denied!'
-                })
-            }
-
-            let location = await Location.getCurrentPositionAsync({});
-
+    getLoction = async ()=>{
+        let location = await getUserLoction();
+        if(location.error){
             this.setState({
-                location: location
-            });
-
-            if(this.state.errorMsg){
-                Alert.alert(null, this.state.errorMsg);
-                return;
-            }
-
-            var loc = JSON.parse(JSON.stringify(location));
-            this.setState({
-                latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude
+                errorMsg: location.error
             })
-            
-            this.setState({
-                locCoords: this.state.latitude.toString()+" "+this.state.longitude.toString()
-            })
+            Alert.alert(null, location.error);
+            return;
+        }
+
+        let loc = JSON.parse(JSON.stringify(location));
+        let latitude = loc.coords.latitude;
+        let longitude = loc.coords.longitude
+        this.setState({
+            latitude,longitude,
+            locCoords:latitude.toString()+" "+longitude.toString()
+        })
     }
 
+    getCustomLocation = (e) => {
+
+        let latitude = e.nativeEvent.coordinate.latitude;
+        let longitude = e.nativeEvent.coordinate.longitude;
+        this.setState({
+            latitude,longitude,
+            locCoords:latitude.toString()+" "+longitude.toString(),
+        })
+        setTimeout(() => this.setState({
+            sheetVisible : !this.state.sheetVisible
+        }), 2000);
+    }
+
+    onCustomSelect() {
+        this.setState({sheetVisible: !this.state.sheetVisible});
+        ToastAndroid.show("Select Location By Pressing For Long.", ToastAndroid.LONG);
+    }
 
     render() {
 
-        
         return (
             <ScrollView style={{flex: 1}}>
                 <View style={{alignItems: 'center'}}>
@@ -157,7 +141,7 @@ class AddSighting extends Component {
                     <View style={{width: '45%', height: 100, paddingRight: '2%'}}>
                         <Button
                             title="Camera"
-                            onPress={this.getImageFromCamera}
+                            onPress={this.getCameraImage}
                             buttonStyle={{backgroundColor: '#85603f', borderRadius: 28}}
                             titleStyle={{color: "white", fontWeight: "bold", paddingHorizontal: '5%'}}
                         />
@@ -165,7 +149,7 @@ class AddSighting extends Component {
                     <View style={{width: '45%', height: 100, paddingLeft: '2%'}}>
                         <Button
                             title="Gallery"
-                            onPress={this.getImageFromGallery}
+                            onPress={this.getGalleryImage}
                             buttonStyle={{backgroundColor: '#85603f', borderRadius: 28}}
                             titleStyle={{color: "white", fontWeight: "bold", paddingHorizontal: '5%'}}
                         />
@@ -187,7 +171,26 @@ class AddSighting extends Component {
                         disabled
                         value={this.state.locCoords}
                         label='LOCATION : '
+                        multiline
                     />
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', paddingTop: '10%', paddingBottom: '0%'}}>
+                    <View style={{width: '45%', height: 100, paddingRight: '2%'}}>
+                        <Button
+                            title="Current"
+                            onPress={this.getLoction}
+                            buttonStyle={{backgroundColor: '#85603f', borderRadius: 28}}
+                            titleStyle={{color: "white", fontWeight: "bold", paddingHorizontal: '5%'}}
+                        />
+                    </View>
+                    <View style={{width: '45%', height: 100, paddingLeft: '2%'}}>
+                        <Button
+                            title="Custom"
+                            onPress={() => this.onCustomSelect()}
+                            buttonStyle={{backgroundColor: '#85603f', borderRadius: 28}}
+                            titleStyle={{color: "white", fontWeight: "bold", paddingHorizontal: '5%'}}
+                        />
+                    </View>
+                    </View>
                     <Input
                         placeholder="Mention Estimated Bird Count...."
                         leftIcon={{ type: 'font-awesome-5', name: 'calculator'}}
@@ -267,6 +270,42 @@ class AddSighting extends Component {
                         }}
                         />
                 </View>
+                    <BottomSheet isVisible={this.state.sheetVisible} >
+                        <View style={{flex: 1, backgroundColor: 'white'}}>
+                        <Text style={{textAlign: 'right', marginBottom: '0%'}}>
+                            <Icon 
+                                name='times-circle'
+                                type='font-awesome-5' 
+                                onPress={() => this.setState({sheetVisible: !this.state.sheetVisible})}
+                                size={30}
+                                />
+                            </Text>
+                        <MapView 
+                            region={{
+                                latitude: this.state.latitude,
+                                longitude: this.state.longitude,
+                                latitudeDelta: 0.005,
+                                longitudeDelta: 0.005
+                            }}
+                            onLongPress={(e) => this.getCustomLocation(e)}
+                            style={{height: screenHeight-500, width: Dimensions.get('window').width}}
+                        >
+                            {this.state.locCoords !== "Enter Current or Custom Location.."
+                            ?
+                            <Marker 
+                                coordinate={{
+                                    latitude: this.state.latitude,
+                                    longitude: this.state.longitude
+                                }}
+                                image={require('./images/Logo.png')}
+                                title={'Selected Location'}
+                            />
+                            :
+                            <View></View>
+                            }
+                        </MapView>
+                        </View>
+                    </BottomSheet>
             </ScrollView>
         );
     }
