@@ -1,0 +1,3 @@
+export const SPECIES_LOADING = "SPECIES_LOADING";
+export const ADD_SPECIES = "ADD_SPECIES";
+export const SPECIES_FAILED = "SPECIES_FAILED";

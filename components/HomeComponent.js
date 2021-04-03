@@ -61,7 +61,7 @@ class Home extends Component {
             wish = "Good Evening!";
         }
 
-        var facto = <Loading text={'Getting You A Bird Fact......'} />;
+        var facto = <Loading text={'Getting You A Bird Fact......'} color='white' />;
 
         if(this.state.birdFact){
             facto =  <Text style={styles.fact}>{"RANDOM BIRD FACT: "+'\n\n'+this.state.birdFact}</Text>;

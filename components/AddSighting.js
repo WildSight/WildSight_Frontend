@@ -17,23 +17,28 @@ class AddSighting extends Component {
         super(props);
         
         this.state={
-            sheetVisible: false,
-            imageUrl: 'abc.png',
-            blob: null,
             name: '',
             locCoords: 'Enter Current or Custom Location..',
             birdCount: '',
+            dateString: '',
+            sheetVisible: false,
+            imageUrl: 'abc.png',
+            blob: null,
             date: new Date(),
             time: new Date(),
             show: false,
             mode: "date",
             dateTime: '',
-            duration: '',
-            dateString: '',
             errorMsg: null,
             latitude: 30.73629,
             longitude:  76.7884,
             location: null,
+            errors: {
+                name: "",
+                locCoords: "",
+                birdCount: "",
+                dateString: ""
+            }
         }
     }
 
@@ -49,9 +54,41 @@ class AddSighting extends Component {
           this.getLoction();
     }*/
 
+    formValidation = ()=>{
+        const {name, locCoords, birdCount, dateString} = this.state;
+        let nameError ="", locError="", birdCountError="", dateStringError="", error=false;
+        if(!name){
+            error=true;
+            nameError="Name is required";
+        }
+        if(locCoords==="Enter Current or Custom Location.."){
+            error=true;
+            locError="Location is required";
+        }
+        if(!birdCount){
+            error=true;
+            birdCountError="Bird Count is required";
+        }
+        if(!dateString){
+            error=true;
+            dateStringError="Date Time is required";
+        }
+        this.setState({
+            errors:{
+                name:nameError,
+                locCoords:locError,
+                birdCount:birdCountError,
+                dateString:dateStringError
+            }
+        })
+        return !error;
+
+    }
+
     handleSubmit = (Sighting) => {
 
-        Alert.alert("Form Submitted", JSON.stringify(Sighting));
+        if(this.formValidation())
+            Alert.alert("Form Submitted", JSON.stringify(Sighting));
     }
 
     getCameraImage= async()=>{
@@ -157,12 +194,13 @@ class AddSighting extends Component {
                 </View>
                 <View style={{marginHorizontal: '5%'}}>
                     <Input
-                        placeholder="Enter Name...."
+                        placeholder="Enter Specie Name...."
                         leftIcon={{ type: 'font-awesome-5', name: 'dove'}}
                         leftIconContainerStyle={{marginRight: 10}}
                         onChangeText={(name) => this.setState({name})}
                         value={this.state.name}
                         label='NAME : '
+                        errorMessage={this.state.errors.name}
                     />
                     <Input
                         placeholder="Input Location...."
@@ -171,6 +209,7 @@ class AddSighting extends Component {
                         disabled
                         value={this.state.locCoords}
                         label='LOCATION : '
+                        errorMessage={this.state.errors.locCoords}
                         multiline
                     />
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', paddingTop: '10%', paddingBottom: '0%'}}>
@@ -200,6 +239,7 @@ class AddSighting extends Component {
                         })}
                         value={this.state.birdCount}
                         label='BIRD COUNT : '
+                        errorMessage={this.state.errors.birdCount}
                     />
                      <View style={{
                                     alignItems: "center",
@@ -229,28 +269,29 @@ class AddSighting extends Component {
                                     </TouchableOpacity>
                                     {this.state.show && (
                                         <DateTimePicker
-                                        value={this.state.date}
-                                        mode={this.state.mode}
-                                        display="default"
-                                        onChange={(selected, value) => {
-                                            if (value !== undefined) {
-                                            this.setState({
-                                                show: this.state.mode === "time" ? false : true,
-                                                mode: "time",
-                                                date: new Date(selected.nativeEvent.timestamp),
-                                                time: new Date(selected.nativeEvent.timestamp),
-                                                dateTime: Moment(new Date(selected.nativeEvent.timestamp)).format('DD-MMM-YYYY h:mm A').toString(),
-                                                dateString: (new Date(selected.nativeEvent.timestamp)).toString()
+                                            value={this.state.date}
+                                            mode={this.state.mode}
+                                            display="default"
+                                            onChange={(selected, value) => {
+                                                if (value !== undefined) {
+                                                this.setState({
+                                                    show: this.state.mode === "time" ? false : true,
+                                                    mode: "time",
+                                                    date: new Date(selected.nativeEvent.timestamp),
+                                                    time: new Date(selected.nativeEvent.timestamp),
+                                                    dateTime: Moment(new Date(selected.nativeEvent.timestamp)).format('DD-MMM-YYYY h:mm A').toString(),
+                                                    dateString: (new Date(selected.nativeEvent.timestamp)).toString()
 
-                                            });
-                                            } else {
-                                            this.setState({ show: false });
-                                            }
-                                        }}
+                                                });
+                                                } else {
+                                                this.setState({ show: false });
+                                                }
+                                            }}
                                         />
                                     )}
                                     </View>
                 </View>
+                <Text style={{color: 'red', textAlign: 'center'}}>{this.state.errors.dateString}</Text>
                 <View style={{marginHorizontal: '5%', marginVertical: '5%'}}>
                 <Button
                         onPress = {() => this.handleSubmit(this.state)}

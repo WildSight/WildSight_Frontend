@@ -39,9 +39,10 @@ class LocationSight extends Component {
             month: monthNames[d.getMonth()],
             sheetVisible: false,
             errorMsg: null,
-            latitude: 37.78825,
-            longitude: -122.4324,
+            latitude: 30.73629,
+            longitude:  76.7884,
             location: null,
+            type: "Current"
         }
     }
 
@@ -59,9 +60,40 @@ class LocationSight extends Component {
             IntentLauncher.startActivityAsync(IntentLauncher.ACTION_LOCATION_SOURCE_SETTINGS);
         }
     }
+    onCustomSelect() {
+
+        this.setState({
+            type: "Custom",
+            sheetVisible: true
+        });
+        ToastAndroid.show("Select Location By Pressing For Long.", ToastAndroid.LONG);
+    }
+
+    getCustomLocation = (e) => {
+
+        if(this.state.type == "Custom"){
+            let latitude = e.nativeEvent.coordinate.latitude;
+            let longitude = e.nativeEvent.coordinate.longitude;
+            var location = {};
+            location.latitude = latitude;
+            location.longitude = longitude;
+            this.setState({
+                latitude,longitude,
+                location: location
+            })
+            setTimeout(() => this.setState({
+                sheetVisible : false
+            }), 2000);
+
+            // fetch Results.
+        }
+    }
 
     getLoction = async () => {
 
+            this.setState({
+                type: "Current"
+            })
             let {status} = await Permissions.askAsync(Permissions.LOCATION);
 
             if(status !== 'granted'){
@@ -86,19 +118,25 @@ class LocationSight extends Component {
                 latitude: loc.coords.latitude,
                 longitude: loc.coords.longitude
             })
-        
+            // fetch results.
     }
 
     componentDidMount(){
 
-        if (Platform.OS === 'android' && !Constants.isDevice) {
-            setErrorMsg(
-              'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
-            );
-            return;
-          }
-        else 
-          this.getLoction();
+        Alert.alert(
+            "Location",
+            "Choose Location Type",
+            [
+              { 
+                  text: "Custom", 
+                  onPress: () => this.onCustomSelect()
+              },
+              {
+                text: "Current",
+                onPress: () => this.getLoction()
+              }
+            ]
+          );
     }
 
     render() {
@@ -162,7 +200,7 @@ class LocationSight extends Component {
 
         let screenHeight = 2*Dimensions.get('window').height;
 
-        if(this.state.location){
+        if(this.state.location || this.state.type === "Custom"){
         
         return (
             <View style={styles.container}>
@@ -174,7 +212,7 @@ class LocationSight extends Component {
                             <Icon 
                                 name='times-circle'
                                 type='font-awesome-5' 
-                                onPress={() => this.setState({sheetVisible: !this.state.sheetVisible})}
+                                onPress={() => this.setState({sheetVisible: false})}
                                 size={30}
                                 />
                             </Text>
@@ -185,21 +223,25 @@ class LocationSight extends Component {
                                 latitudeDelta: 0.005,
                                 longitudeDelta: 0.005
                             }}
-                            onLongPress={(e) => console.log(e.nativeEvent)}
+                            onLongPress={(e) => this.getCustomLocation(e)}
                             style={{height: screenHeight-500, width: Dimensions.get('window').width}}
                         >
+                            {this.state.location
+                            ?
                             <Marker 
                                 coordinate={{
                                     latitude: this.state.latitude,
                                     longitude: this.state.longitude
                                 }}
                                 image={require('./images/Logo.png')}
-                                title={'Current Location'}
+                                title={'Selected Location'}
                             />
+                            :
+                            <View></View>
+                            }
                         </MapView>
                         </View>
                     </BottomSheet>
-                    
                     <FlatList
                         data={data.sort((s1, s2) => s2.sightings-s1.sightings)}
                         renderItem={renderListItem}
@@ -256,7 +298,7 @@ class LocationSight extends Component {
             return(
                 <View style={styles.container}>
                     <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
-                        <Loading text={'Getting Your Current Location ..... \n\n Location Services Must be ON'} />
+                        <Loading text={'Getting Location ..... \n\n Location Services Must be ON for Current Location'} color='#fa4659' />
                     </ImageBackground>
                 </View>
             );

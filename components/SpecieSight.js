@@ -2,7 +2,22 @@ import React, {Component} from 'react';
 import { View, Image, ImageBackground, Text, StyleSheet} from 'react-native';
 import { Icon } from 'react-native-elements';
 import SearchableDropdown from 'react-native-searchable-dropdown';
-import axios from "axios";
+import { connect } from "react-redux";
+import {fetchSpecies} from '../redux/actions/specie';
+import {Loading} from './LoadingComponent';
+
+const  mapStateToProps = (state) => {
+    return{
+        species: state.species
+    };
+}
+
+const mapDispatchToProps = dispatch => {
+    
+    return {
+        fetchSpecies: () => dispatch(fetchSpecies()),
+    };
+}
 
 var items = [
     {
@@ -46,14 +61,30 @@ class SpecieSight extends Component {
         this.state={
             searchErr: '',
             selectedItems: [],
-            birds: []
+            birdNames: []
         }
     }
 
-    
+    componentDidMount = async () => {
+        await this.props.fetchSpecies();
+
+        let birds = this.props.species.species;
+        let birdNames = this.state.birdNames;
+        var bird = {};
+        for(var i=0;i<birds.length;i++)
+        {
+            bird.id = birds[i].id;
+            bird.name = birds[i].common_name;
+            birdNames.push(bird);
+            bird = {};
+        }
+
+        this.setState({
+            birdNames: birdNames
+        });
+    }
 
     
-
     search(){
 
         var species = this.state.selectedItems;
@@ -77,6 +108,23 @@ class SpecieSight extends Component {
     }
 
     render() {
+
+        if(this.props.species.isLoading){
+            return(
+                <View style={styles.container}>
+                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
+                    <Loading text='Fetching Bird Names ....' color='black'/>
+                </ImageBackground>
+                </View>
+            );
+        }
+        else if(this.props.species.errMess){
+            return(
+                <View>
+                    <Text>{this.props.species.errMess}</Text>
+                </View>
+            );
+        }
         return (
             <View style={styles.container}>
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
@@ -86,6 +134,13 @@ class SpecieSight extends Component {
                         multi={true}
                         selectedItems={this.state.selectedItems}
                         onItemSelect={(item) => {
+
+                            if(this.state.selectedItems.length === 1){
+                                this.setState({
+                                    searchErr: '*Only one specie per search is allowed.'
+                                });
+                                return;
+                            }
                             this.setState({
                                 searchErr: ''
                             });
@@ -107,7 +162,7 @@ class SpecieSight extends Component {
                         itemStyle={styles.searchItemStyle}
                         itemTextStyle={{ color: '#222' }}
                         itemsContainerStyle={{ maxHeight: 140}}
-                        items={items}
+                        items={this.state.birdNames}
                         chip={true}
                         resetValue={false}
                         textInputProps={
@@ -178,4 +233,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SpecieSight;
+export default connect(mapStateToProps, mapDispatchToProps)(SpecieSight);
