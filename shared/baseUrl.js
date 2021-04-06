@@ -1,1 +1,1 @@
-export const baseUrl = 'http://<your_ip>/api/';
+export const baseUrl = 'http://<your_ip_address>/api/';
