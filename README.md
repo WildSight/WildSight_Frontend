@@ -3,7 +3,7 @@
 </p>
 
 > WildSight is a platform for data collection and awareness about wildlife especially birds. The application leverages the interest of bird watchers which is source of leisure for them and a great means for data collection about wildlife important for further research works by orgainization.
-> We developed a cross-platform Mobile applications (android+ios) to bring idea into existence.
+> We developed a <b>Cross-platform Mobile application</b> (android+ios) to bring idea into existence.
 
 ### ✨ [Demo](https://github.com/WildSight/WildSight_Frontend)
 
