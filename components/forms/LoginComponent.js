@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import { View, ImageBackground, Text, Alert, StyleSheet, TouchableOpacity} from 'react-native';
 import { Button, Image, Input, Icon} from 'react-native-elements';
-
+import {signIn} from '../../redux/actions/auth';
 
 class Login extends Component {
     constructor(props){
@@ -41,9 +42,21 @@ class Login extends Component {
 
     }
 
-    handleSubmit= ()=>{
+    handleSubmit= async()=>{
+        const {userName, password} = this.state;
         if(this.formValidation()){
             console.log("Values recorded");
+            const data = {username:userName, password};
+            await this.props.signIn(data);
+            if(this.props.auth.errMess){
+                Alert.alert("Login failed",this.props.auth.errMess);
+            }else if(this.props.auth.message){
+                Alert.alert("Login Successfull",this.props.auth.message);
+            }
+            this.setState({
+                userName:"",
+                password:""
+            })
         }
         
     }
@@ -129,4 +142,12 @@ const styles = StyleSheet.create({
       }
 });
 
-export default Login; 
+const mapStateToProps = (state, ownProps)=>{
+    return({
+        ...ownProps,
+        auth: state.Auth
+    })
+
+}
+
+export default connect(mapStateToProps, {signIn})(Login); 

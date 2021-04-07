@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import { View, ImageBackground, Text, Alert, StyleSheet, Dimensions, TouchableOpacity} from 'react-native';
 import { Button, Input, Icon} from 'react-native-elements';
-
+import {signUp} from '../../redux/actions/auth';
 class Register extends Component {
     constructor(props){
         super(props);
@@ -50,10 +51,23 @@ class Register extends Component {
         return !error;
 
     }
-    handleSubmit= ()=>{
+    handleSubmit= async()=>{
         const {userName, email, password} = this.state;
-        if(this.formValidation())
+        if(this.formValidation()){
             console.log("Data recorded");
+            const data = {username:userName, email, password};
+            await this.props.signUp(data);
+            if(this.props.auth.errMess){
+                Alert.alert("Registration failed",this.props.auth.errMess);
+            }else if(this.props.auth.message){
+                Alert.alert("Registration Successfull",this.props.auth.message);
+            }
+            this.setState({
+                userName:"",
+                email:"",
+                password:""
+            })
+        }
     }
 
     render() {
@@ -149,4 +163,11 @@ const styles = StyleSheet.create({
       }
 });
 
-export default Register; 
+const mapStateToProps = (state, ownProps)=>{
+    return({
+        ...ownProps,
+        auth: state.Auth
+    })
+
+}
+export default connect(mapStateToProps, {signUp})(Register); 
