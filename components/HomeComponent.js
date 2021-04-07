@@ -12,7 +12,7 @@ class Home extends Component {
         this.state={
             birdFact: "",
             refreshing: false,
-            loggedIn:true
+            loggedIn:false
         }
     }
 

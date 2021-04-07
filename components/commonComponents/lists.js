@@ -97,6 +97,4 @@ function CardTemplate (props){
             
         )
 }
-
-
 export default  CardTemplate;

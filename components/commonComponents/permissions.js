@@ -75,7 +75,4 @@ export async function getUserLoction(){
             error: 'Permission to access location is denied!'
         }
     }
-
-    
-    
 }
