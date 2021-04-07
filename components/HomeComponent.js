@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import{connect} from 'react-redux';
 import { View, RefreshControl, Image, StatusBar, ImageBackground, Text, StyleSheet} from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -29,9 +30,19 @@ class Home extends Component {
         .catch(() => this.setState({
             birdFact: "Can't Fetch BirdoFact :("
         }));
+        if(this.props.auth.userId){
+            this.setState({
+                loggedIn:true
+            })
+        }else{
+            this.setState({
+                loggedIn:false
+            })
+        }
 
         this.setState({
-            refreshing: false
+            refreshing: false,
+            loggedIn:this.props.auth.userId?true:false
         });
     }
 
@@ -45,6 +56,10 @@ class Home extends Component {
         .catch(() => this.setState({
             birdFact: "Can't Fetch BirdoFact :("
         }))
+        this.setState({
+            loggedIn:this.props.auth.userId?true:false
+        })
+        
     }
 
     render() {
@@ -85,7 +100,7 @@ class Home extends Component {
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                     <View style={{height:'100%', backgroundColor: "#00000099"}}>
                         <Text style={styles.wish}>{wish}</Text>
-                        <Text style={styles.name}>{this.state.loggedIn&&"Bhavesh Kumar" ||"Welcome to Wildsight"} </Text>
+                        <Text style={styles.name}>Welcome to Wildsight</Text>
                         
                         <View style={styles.section}>
                             <View style={{paddingTop: '15%'}}>
@@ -236,4 +251,11 @@ const styles = StyleSheet.create({
       },
 });
 
-export default Home; 
+const mapStateToProps = (state, ownProps)=>{
+    return({
+        ...ownProps,
+        auth: state.Auth
+    })
+
+}
+export default connect(mapStateToProps,{})(Home); 
