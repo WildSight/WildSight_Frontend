@@ -1,15 +1,35 @@
 import React, {Component} from 'react';
-import { View, ScrollView, Text, Alert, Dimensions, TouchableOpacity, ToastAndroid} from 'react-native';
-import { Button, Image, Input, Icon, BottomSheet} from 'react-native-elements';
+import { View, ScrollView, Text, Alert, Dimensions, TouchableOpacity, ToastAndroid, FlatList, SectionList} from 'react-native';
+import { Button, Image, Input, Icon, BottomSheet, ListItem} from 'react-native-elements';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Moment from 'moment';
 import MapView, {Marker} from 'react-native-maps';
 import {openSettingApp, getImageFromGallery, getImageFromCamera, getUserLoction} from './commonComponents/permissions';
+import { connect } from "react-redux";
+import {fetchSpecies, searchSpecie} from '../redux/actions/specie';
+import {Loading} from './LoadingComponent';
+import { SafeAreaView } from 'react-native';
+
 
 
 var width = Dimensions.get('window').width;
 var heigth = Math.floor(Dimensions.get('window').height/3);
 let screenHeight = 2*Dimensions.get('window').height;
+
+const  mapStateToProps = (state) => {
+    return{
+        species: state.species
+    };
+}
+
+const mapDispatchToProps = dispatch => {
+    
+    return {
+        fetchSpecies: () => dispatch(fetchSpecies()),
+        searchSpecie: (birdFilter) => dispatch(searchSpecie(birdFilter))
+    };
+}
+
 
 class AddSighting extends Component {
 
@@ -24,6 +44,7 @@ class AddSighting extends Component {
             sheetVisible: false,
             imageUrl: 'abc.png',
             blob: null,
+            showDatePicker: false,
             date: new Date(),
             time: new Date(),
             show: false,
@@ -38,21 +59,13 @@ class AddSighting extends Component {
                 locCoords: "",
                 birdCount: "",
                 dateString: ""
-            }
+            },
+            searchErr: '',
+            birds: [],
+            birdId: ''
         }
     }
 
-    /*componentDidMount(){
-
-        if (Platform.OS === 'android' && !Constants.isDevice) {
-            setErrorMsg(
-              'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
-            );
-            return;
-          }
-        else 
-          this.getLoction();
-    }*/
 
     formValidation = ()=>{
         const {name, locCoords, birdCount, dateString} = this.state;
@@ -163,7 +176,80 @@ class AddSighting extends Component {
         ToastAndroid.show("Select Location By Pressing For Long.", ToastAndroid.LONG);
     }
 
+    updateSearch = async (name) => {
+
+        this.setState({ name });
+
+        if(name.length< 3){
+
+            this.setState({
+                birds: [],
+                searchErr: '*Enter atleast 3 characters to begin search.',
+            });
+        }
+        else if(name.length >= 2){
+            await this.props.searchSpecie(name);
+
+            let birds = this.props.species.species;
+
+            this.setState({
+                birds: birds,
+                searchErr: ''
+            });
+        }
+    };
+
     render() {
+
+        const finalFilter = (bird) => {
+            this.setState({
+                name: bird.common_name,
+                birdId: bird.id.toString(),
+                birds: []
+            })
+        }
+
+        function renderListItem({item, index}){
+
+            return(
+                <ListItem
+                    key={index}
+                    pad = {10}
+                    onPress={() => finalFilter(item)}
+                >   
+                    <ListItem.Content>
+                        <ListItem.Title style={{fontWeight: 'bold', color: 'black'}}>
+                            <Icon name='feather'
+                                        type="font-awesome-5" 
+                                        color='black'
+                                        size={15}
+                                        iconStyle={{marginRight: 10}} />{item.common_name}
+                        </ListItem.Title>
+                    </ListItem.Content>
+                </ListItem>
+            );
+        }
+
+        var list;
+
+        if(this.props.species.isLoading){
+            
+            list = <Loading text='Getting names ....' color='black'/>
+                                
+        }
+        else if(this.props.species.errMess){
+                    list = <Text>{this.props.species.errMess}</Text>
+        }
+        else if(this.state.birds.length){
+
+            list = <FlatList
+                        data={this.state.birds}
+                        renderItem={renderListItem}
+                        keyExtractor={item => item.id.toString()}
+                        style={{marginTop: 0}}
+                        />
+        }
+
 
         return (
             <ScrollView style={{flex: 1}}>
@@ -194,14 +280,17 @@ class AddSighting extends Component {
                 </View>
                 <View style={{marginHorizontal: '5%'}}>
                     <Input
-                        placeholder="Enter Specie Name...."
+                        placeholder="Enter Specie Name ..."
                         leftIcon={{ type: 'font-awesome-5', name: 'dove'}}
                         leftIconContainerStyle={{marginRight: 10}}
-                        onChangeText={(name) => this.setState({name})}
+                        onChangeText={(name) => this.updateSearch(name)}
                         value={this.state.name}
                         label='NAME : '
                         errorMessage={this.state.errors.name}
                     />
+                    <View>
+                        {list}
+                    </View>
                     <Input
                         placeholder="Input Location...."
                         leftIcon={{ type: 'font-awesome-5', name: 'map-marker-alt'}}
@@ -260,6 +349,7 @@ class AddSighting extends Component {
                                             flexDirection: "row",
                                             borderRadius: 20
                                         }}
+                                        
                                         onPress={() => this.setState({ show: true, mode: 'date' })}
                                     >
                                     <Icon type='font-awesome-5' name='calendar-alt' color="#158467" style={{paddingRight: 10}} />
@@ -267,28 +357,29 @@ class AddSighting extends Component {
                                         {' ' + Moment(this.state.date).format('DD-MMM-YYYY h:mm A') }
                                     </Text>
                                     </TouchableOpacity>
-                                    {this.state.show && (
-                                        <DateTimePicker
-                                            value={this.state.date}
-                                            mode={this.state.mode}
-                                            display="default"
-                                            onChange={(selected, value) => {
-                                                if (value !== undefined) {
-                                                this.setState({
-                                                    show: this.state.mode === "time" ? false : true,
-                                                    mode: "time",
-                                                    date: new Date(selected.nativeEvent.timestamp),
-                                                    time: new Date(selected.nativeEvent.timestamp),
-                                                    dateTime: Moment(new Date(selected.nativeEvent.timestamp)).format('DD-MMM-YYYY h:mm A').toString(),
-                                                    dateString: (new Date(selected.nativeEvent.timestamp)).toString()
-
-                                                });
-                                                } else {
-                                                this.setState({ show: false });
-                                                }
-                                            }}
-                                        />
-                                    )}
+                                        {this.state.show && (
+                                            <DateTimePicker
+                                                value={this.state.date}
+                                                mode={this.state.mode}
+                                                display="default"
+                                                minimumDate={new Date()}
+                                                onChange={(selected, value) => {
+                                                    if (value !== undefined) {
+                                                    this.setState({
+                                                        show: this.state.mode === "time" ? false : true,
+                                                        mode: "time",
+                                                        date: new Date(selected.nativeEvent.timestamp),
+                                                        time: new Date(selected.nativeEvent.timestamp),
+                                                        dateTime: Moment(new Date(selected.nativeEvent.timestamp)).format('DD-MMM-YYYY h:mm A').toString(),
+                                                        dateString: (new Date(selected.nativeEvent.timestamp)).toString()
+        
+                                                    });
+                                                    } else {
+                                                    this.setState({ show: false });
+                                                    }
+                                                }}
+                                            />
+                                        )}
                                     </View>
                 </View>
                 <Text style={{color: 'red', textAlign: 'center'}}>{this.state.errors.dateString}</Text>
@@ -353,4 +444,4 @@ class AddSighting extends Component {
 }
   
 
-export default AddSighting;
+export default connect(mapStateToProps, mapDispatchToProps)(AddSighting);

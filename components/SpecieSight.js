@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import { View, Image, ImageBackground, Text, StyleSheet} from 'react-native';
-import { Icon } from 'react-native-elements';
+import { View, Image, ImageBackground, Text, StyleSheet, FlatList} from 'react-native';
+import { Icon, Input, SearchBar, ListItem } from 'react-native-elements';
 import SearchableDropdown from 'react-native-searchable-dropdown';
 import { connect } from "react-redux";
-import {fetchSpecies} from '../redux/actions/specie';
+import {fetchSpecies, searchSpecie} from '../redux/actions/specie';
 import {Loading} from './LoadingComponent';
 
 const  mapStateToProps = (state) => {
@@ -16,43 +16,10 @@ const mapDispatchToProps = dispatch => {
     
     return {
         fetchSpecies: () => dispatch(fetchSpecies()),
+        searchSpecie: (birdFilter) => dispatch(searchSpecie(birdFilter))
     };
 }
 
-var items = [
-    {
-      id: 1,
-      name: 'JavaScript',
-    },
-    {
-      id: 2,
-      name: 'Java',
-    },
-    {
-      id: 3,
-      name: 'Ruby',
-    },
-    {
-      id: 4,
-      name: 'React Native',
-    },
-    {
-      id: 5,
-      name: 'PHP',
-    },
-    {
-      id: 6,
-      name: 'Python',
-    },
-    {
-      id: 7,
-      name: 'Go',
-    },
-    {
-      id: 8,
-      name: 'Swift',
-    },
-  ];
 
 class SpecieSight extends Component {
 
@@ -60,136 +27,105 @@ class SpecieSight extends Component {
         super(props);
         this.state={
             searchErr: '',
-            selectedItems: [],
-            birdNames: []
+            birds: [],
+            birdFilter: '',
         }
     }
 
-    componentDidMount = async () => {
-        await this.props.fetchSpecies();
+    updateSearch = async (birdFilter) => {
 
-        let birds = this.props.species.species;
-        let birdNames = this.state.birdNames;
-        var bird = {};
-        for(var i=0;i<birds.length;i++)
-        {
-            bird.id = birds[i].id;
-            bird.name = birds[i].common_name;
-            birdNames.push(bird);
-            bird = {};
+        this.setState({ birdFilter });
+
+        if(birdFilter.length< 3){
+
+            this.setState({
+                birds: [],
+                searchErr: '*Enter atleast 3 characters to begin search.'
+            });
         }
+        else if(birdFilter.length >= 2){
+            await this.props.searchSpecie(birdFilter);
 
-        this.setState({
-            birdNames: birdNames
-        });
-    }
+            let birds = this.props.species.species;
+
+            this.setState({
+                birds: birds,
+                searchErr: ''
+            });
+        }
+    };
 
     
-    search(){
-
-        var species = this.state.selectedItems;
-
-        if(species.length === 0)
-        {
-            this.setState({
-                searchErr: '*Enter atleast one specie for search.'
-            })
-            return;
-        }
-
-        this.setState({
-            searchErr: ''
-        })
-
-        console.log('Starting search with....... \n');
-        for(var i=0;i<species.length;i++){
-            console.log(species[i].name+"\n");
-        }
-    }
 
     render() {
 
-        if(this.props.species.isLoading){
+        const finalFilter = (filter) => {
+            this.setState({
+                birdFilter: filter,
+                birds: []
+            })
+        }
+
+        function renderListItem({item, index}){
+
+            var name = item.common_name;
             return(
-                <View style={styles.container}>
-                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
-                    <Loading text='Fetching Bird Names ....' color='black'/>
-                </ImageBackground>
-                </View>
+                <ListItem
+                    key={index}
+                    pad = {10}
+                    onPress={() => finalFilter(name)}
+                >   
+                    <ListItem.Content>
+                        <ListItem.Title style={{fontWeight: 'bold', color: 'black'}}>
+                            <Icon name='feather'
+                                        type="font-awesome-5" 
+                                        color='black'
+                                        size={15}
+                                        iconStyle={{marginRight: 10}} />{item.common_name}
+                        </ListItem.Title>
+                    </ListItem.Content>
+                </ListItem>
             );
+        }
+
+        var list;
+
+        if(this.props.species.isLoading){
+            
+            list = <Loading text='Fetching Results ....' color='black'/>
+                                
         }
         else if(this.props.species.errMess){
-            return(
-                <View>
-                    <Text>{this.props.species.errMess}</Text>
-                </View>
-            );
+                    list = <Text>{this.props.species.errMess}</Text>
         }
+        else{
+
+            list = <FlatList
+                        data={this.state.birds}
+                        renderItem={renderListItem}
+                        keyExtractor={item => item.id.toString()}
+                        style={{marginTop: 0}}
+                        />
+        }
+
         return (
             <View style={styles.container}>
-                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
-                <View style={styles.searchBar}>
-                    <View style={{flex: 6, height: 140}}>
-                    <SearchableDropdown
-                        multi={true}
-                        selectedItems={this.state.selectedItems}
-                        onItemSelect={(item) => {
-
-                            if(this.state.selectedItems.length === 1){
-                                this.setState({
-                                    searchErr: '*Only one specie per search is allowed.'
-                                });
-                                return;
-                            }
-                            this.setState({
-                                searchErr: ''
-                            });
-                            const items = this.state.selectedItems;
-                            items.push(item)
-                            this.setState({ selectedItems: items });
-                        }}
-                        containerStyle={{ padding: 5 }}
-                        onRemoveItem={(item, index) => {
-                            const items = this.state.selectedItems.filter((sitem) => sitem.id !== item.id);
-                            this.setState({ selectedItems: items });
-
-                            if(this.state.selectedItems.length === 0){
-                                this.setState({
-                                    searchErr: '*Enter atleast one specie for search.'
-                                })
-                            }
-                        }}
-                        itemStyle={styles.searchItemStyle}
-                        itemTextStyle={{ color: '#222' }}
-                        itemsContainerStyle={{ maxHeight: 140}}
-                        items={this.state.birdNames}
-                        chip={true}
-                        resetValue={false}
-                        textInputProps={
-                        {
-                            placeholder: "ENTER SPECIES TO SIGHT",
-                            underlineColorAndroid: "transparent",
-                            style: styles.searchInputStyle
-                        }
-                        }
-                        listProps={
-                        {
-                            nestedScrollEnabled: true,
-                        }
-                        }
-                        
+                <SearchBar
+                        placeholder="Search Specie by Names..."
+                        onChangeText={this.updateSearch}
+                        onClear={() => this.setState({
+                            birds: []
+                        })}
+                        value={this.state.birdFilter}
+                        clearIcon={{size: 20}}
+                        searchIcon={{size: 25}}
+                        round
+                        clear
+                        lightTheme
                     />
-                    <Text style={{color: 'red', marginLeft: 5}}>{this.state.searchErr}</Text>
-                    </View>
-                    <Icon
-                        style={{flex: 1}}
-                        color="#065446"
-                        raised
-                        name='search'
-                        type='font-awesome-5'
-                        onPress={() => this.search()}
-                        reverse />
-                </View>
+                {this.state.searchErr ? <Text style={{color: 'red'}}>{this.state.searchErr}</Text>: <View></View>}
+                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
+                    {list}
                 </ImageBackground>
             </View>
         );

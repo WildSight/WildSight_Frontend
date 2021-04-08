@@ -1,3 +1,16 @@
 export const SPECIES_LOADING = "SPECIES_LOADING";
 export const ADD_SPECIES = "ADD_SPECIES";
 export const SPECIES_FAILED = "SPECIES_FAILED";
+export const GET_SPECIE = "GET_SPECIE"
+
+export const GRID_LOADING = "GRID_LOADING";
+export const ADD_GRIDS = "ADD_GRIDS";
+export const GRIDS_FAILED = "GRIDS_FAILED";
+
+export const SIGHTINGS_LOADING = "SIGHTINGS_LOADING";
+export const ADD_SIGHTINS = "ADD_SIGHTINGS";
+export const SIGHTINGS_FAILED = "SIGHTINGS_FAILED";
+
+export const BIRD_LOADING = "BIRD_LOADING";
+export const BIRD_FAILED = "BIRD_FAILED";
+export const GET_BIRD = "GET_BIRD";

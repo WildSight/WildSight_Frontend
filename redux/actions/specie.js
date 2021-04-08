@@ -3,7 +3,7 @@ import { baseUrl } from "../../shared/baseUrl";
 const axios = require("axios");
 
 
-export const fetchSpecies = (interests) => (dispatch) => {
+export const fetchSpecies = () => (dispatch) => {
 
 	dispatch(speciesLoading(true));
 	return fetch(baseUrl + 'Species/')
@@ -25,9 +25,35 @@ export const fetchSpecies = (interests) => (dispatch) => {
 			}
 		)
 		.then((response) => response.json())
-		.then((species) => dispatch(addSpecies(species)))
+		.then((specie) => dispatch(addSpecies(specie)))
 		.catch((error) => dispatch(speciesFailed(error.message)));
 };
+
+export const searchSpecie = (birdFilter) => (dispatch) => {
+
+	dispatch(speciesLoading(true));
+	return fetch(baseUrl + `Species/?search=${birdFilter}`)
+		.then(
+			(response) => {
+				if (response.ok) {
+					return response;
+				} else {
+					var error = new Error(
+						"Error " + response.status + ": " + response.statusText
+					);
+					error.response = response;
+					throw error;
+				}
+			},
+			(error) => {
+				var errmess = new Error(error.message);
+				throw errmess;
+			}
+		)
+		.then((response) => response.json())
+		.then((species) => dispatch(addSpecies(species)))
+		.catch((error) => dispatch(speciesFailed(error.message)));
+}
 
 export const speciesLoading = () => ({
 	type: ActionTypes.SPECIES_LOADING,
