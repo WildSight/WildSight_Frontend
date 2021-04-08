@@ -6,6 +6,6 @@ const record =  axios.create({
 })
 const authRecord =(token) => axios.create({
     baseURL:baseUrl,
-    headers: {'Authorization': 'Bearer '+ token}
+    headers: {'Authorization': 'Token '+ token}
   });
 export {baseUrl, authRecord, record}

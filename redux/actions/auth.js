@@ -3,8 +3,7 @@ import { record, authRecord } from "../../shared/baseUrl";
 import {REGISTER_USER, LOGIN_USER, LOGOUT_USER, AUTH_FAILED} from '../ActionTypes'
 export const signUp = (userDetails)=> async(dispatch, getState)=>{
     try{
-        const response = await record.post('auth/register', userDetails);//check backend url
-        console.log("Success");
+        const response = await record.post('auth/register', userDetails);
         await AsyncStorage.setItem('loginData', JSON.stringify(response.data));
         dispatch({type:REGISTER_USER, payload: response.data});
 
@@ -27,8 +26,7 @@ export const signUp = (userDetails)=> async(dispatch, getState)=>{
 
 export const signIn = (userDetails)=> async(dispatch, getState)=>{
     try{
-        const response = await record.post('/auth/login', userDetails);//check backend url
-        console.log(response.data);
+        const response = await record.post('/auth/login', userDetails);
         await AsyncStorage.setItem('loginData', JSON.stringify(response.data));
         dispatch({type:LOGIN_USER, payload: response.data});
     }catch(e){

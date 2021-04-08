@@ -45,7 +45,6 @@ class Login extends Component {
     handleSubmit= async()=>{
         const {userName, password} = this.state;
         if(this.formValidation()){
-            console.log("Values recorded");
             const data = {username:userName, password};
             await this.props.signIn(data);
             if(this.props.auth.errMess){

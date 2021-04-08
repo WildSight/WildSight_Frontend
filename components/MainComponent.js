@@ -311,23 +311,25 @@ class Main extends Component {
                     }}
                     >
                 </Tab.Screen>
-                <Tab.Screen
-                    name = "Ratification"
-                    component = {RatificationNavigatorScreen}
-                    options = {{
-                        title: 'Ratification',
-                        tabBarIcon: ({ color: tintColor, focused }) => (
-                            <Icon
-                            name='check-circle'
-                            type='font-awesome-5'    
-                            size={focused ? 30 : 24}        
-                            iconStyle={{ color: tintColor }}
-                            />
-                        )
-                    }}
-                    >
-                </Tab.Screen>
-                <Tab.Screen
+                {(this.props.auth.userId)&&
+                <>
+                    <Tab.Screen
+                        name = "Ratification"
+                        component = {RatificationNavigatorScreen}
+                        options = {{
+                            title: 'Ratification',
+                            tabBarIcon: ({ color: tintColor, focused }) => (
+                                <Icon
+                                name='check-circle'
+                                type='font-awesome-5'    
+                                size={focused ? 30 : 24}        
+                                iconStyle={{ color: tintColor }}
+                                />
+                            )
+                        }}
+                        >
+                    </Tab.Screen>
+                    <Tab.Screen
                     name = "Profile"
                     component = {ProfileNavigatorScreen}
                     options = {{
@@ -343,11 +345,17 @@ class Main extends Component {
                     }}
                     >
                 </Tab.Screen>
-                
+                </>}
             </Tab.Navigator>          
         </NavigationContainer>
     );
   }
 }
+const mapStateToProps = (state, ownProps)=>{
+    return({
+        ...ownProps,
+        auth: state.Auth
+    })
 
-export default connect(null,{setLoginStatus})(Main); 
+}
+export default connect(mapStateToProps,{setLoginStatus})(Main); 
