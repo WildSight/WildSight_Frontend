@@ -1,1 +1,11 @@
-export const baseUrl = 'http://<yourIp:portNo>/api/';
+const baseUrl = 'http:/<"your_ip_address">:<"port_number">/api/';
+import axios from 'axios';
+
+const record =  axios.create({
+    baseURL:baseUrl
+})
+const authRecord =(token) => axios.create({
+    baseURL:baseUrl,
+    headers: {'Authorization': 'Bearer '+ token}
+  });
+export {baseUrl, authRecord, record}

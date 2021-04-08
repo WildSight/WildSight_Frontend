@@ -1,34 +1,30 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import { View, ImageBackground, Text, Alert, StyleSheet, TouchableOpacity} from 'react-native';
 import { Button, Image, Input, Icon} from 'react-native-elements';
-
+import {signIn} from '../../redux/actions/auth';
 
 class Login extends Component {
     constructor(props){
         super(props);
         this.state = {
-            email:"",
+            userName:"",
             password:"",
             errors:{
-                email:"",
+                userName:"",
                 password:""
             }
         }
     }
 
     formValidation = ()=>{
-        const {email, password} = this.state;
-        let emailError="", passwordError="", error=false;
-        if(!email){
+        const {userName, password} = this.state;
+        let userNameError="", passwordError="", error=false;
+        if(!userName){
             error=true;
-            emailError="Email is required";
-        }else{
-            const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            if(!re.test(String(email).toLowerCase())){
-                error = true
-                emailError="Enter a valid email";
-            }
+            userNameError="User Name is required";
         }
+        
         if(!password){
             error=true;
             passwordError="Password is required";
@@ -39,16 +35,28 @@ class Login extends Component {
         this.setState({
             errors:{
                 password:passwordError,
-                email:emailError
+                userName:userNameError
             }
         })
         return !error;
 
     }
 
-    handleSubmit= ()=>{
+    handleSubmit= async()=>{
+        const {userName, password} = this.state;
         if(this.formValidation()){
             console.log("Values recorded");
+            const data = {username:userName, password};
+            await this.props.signIn(data);
+            if(this.props.auth.errMess){
+                Alert.alert("Login failed",this.props.auth.errMess);
+            }else if(this.props.auth.message){
+                Alert.alert("Login Successfull",this.props.auth.message);
+            }
+            this.setState({
+                userName:"",
+                password:""
+            })
         }
         
     }
@@ -60,13 +68,13 @@ class Login extends Component {
                     <View style={{height:'100%', backgroundColor: "#000000aa"}}>
                         <View style={{marginHorizontal: '5%', marginTop:'40%'}}>
                         <Input
-                            placeholder="Enter Email...."
+                            placeholder="Enter Username...."
                             leftIcon={{ type: 'font-awesome-5', name: 'envelope', color: '#11cbd7'}}
                             leftIconContainerStyle={{marginRight: 10}}
-                            onChangeText={(email) => this.setState({email})}
-                            value={this.state.email}
-                            label='EMAIL : '
-                            errorMessage = {this.state.errors.email}
+                            onChangeText={(userName) => this.setState({userName})}
+                            value={this.state.userName}
+                            label='USER NAME : '
+                            errorMessage = {this.state.errors.userName}
                             labelStyle={{color: 'white'}}
                             placeholderTextColor='white'
                             style={{color: 'white'}}
@@ -134,4 +142,12 @@ const styles = StyleSheet.create({
       }
 });
 
-export default Login; 
+const mapStateToProps = (state, ownProps)=>{
+    return({
+        ...ownProps,
+        auth: state.Auth
+    })
+
+}
+
+export default connect(mapStateToProps, {signIn})(Login); 

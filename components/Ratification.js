@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { View, Image, ImageBackground, Text, StyleSheet, FlatList} from 'react-native';
-import ListTemplate from './commonComponents/lists';
+import CardTemplate from './commonComponents/lists';
 const data = [
   {id: 1, name: "Sparrow", category: "Common", sightings: 100, image: "./images/sparrow.jpg", location:"Bird Island", upvotes:15, downvotes:5},
   {id: 2, name: "Myna", category: "Common", sightings: 75, image: "./images/sparrow.jpg", location:"Bird Island", upvotes:1, downvotes:25},
@@ -22,7 +22,7 @@ class Ratification extends Component {
                         {/* <Text style={styles.text}>Ratification Screen</Text> */}
                         <FlatList
                         data={data}
-                        renderItem={ListTemplate}
+                        renderItem={CardTemplate}
                         keyExtractor={item => item.id.toString()}
                         style={{marginBottom: 30}}
                         /> 

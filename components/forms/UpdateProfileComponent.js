@@ -1,49 +1,43 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
 import { View, ImageBackground, Text, Alert, StyleSheet, Dimensions, TouchableOpacity} from 'react-native';
-import { Button, Input, Icon} from 'react-native-elements';
-import {signUp} from '../../redux/actions/auth';
-class Register extends Component {
+import { Button, Image, Input, Icon} from 'react-native-elements';
+import {getImageFromGallery} from '../commonComponents/permissions'
+
+var width = Math.floor(Dimensions.get('window').width/2);
+var heigth = Math.floor(Dimensions.get('window').height/3);
+
+class UpdateUser extends Component {
     constructor(props){
         super(props);
         this.state = {
-            userName:"",
+            firstName:"",
+            lastName:"",
             email:"",
             password:"",
+            imageUrl:"",
+            blob:null,
             errors:{
-                userName:"",
                 email:"",
                 password:""
             }
         }
     }
     formValidation = ()=>{
-        const {userName, email, password} = this.state;
-        let userNameError ="", emailError="", passwordError="", error=false;
-        if(!userName){
-            error=true;
-            userNameError="Username is required";
-        }
-        if(!email){
-            error=true;
-            emailError="Email is required";
-        }else{
+        const {email, password} = this.state;
+        let emailError="", passwordError="", error=false;
+        if(email){
             const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             if(!re.test(String(email).toLowerCase())){
                 error = true
                 emailError="Enter a valid email";
             }
         }
-        if(!password){
-            error=true;
-            passwordError="Password is required";
-        }else if(String(password).length<4){
+        if(!password && (String(password).length<4)){
             error=true;
             passwordError="Password should be 4 or more characters long";
         }
         this.setState({
             errors:{
-                userName:userNameError,
                 password:passwordError,
                 email:emailError
             }
@@ -51,24 +45,29 @@ class Register extends Component {
         return !error;
 
     }
-    handleSubmit= async()=>{
-        const {userName, email, password} = this.state;
-        if(this.formValidation()){
+    handleSubmit= ()=>{
+        const {firstName, lastName, email, password, imageUrl} = this.state;
+        if(this.formValidation())
             console.log("Data recorded");
-            const data = {username:userName, email, password};
-            await this.props.signUp(data);
-            if(this.props.auth.errMess){
-                Alert.alert("Registration failed",this.props.auth.errMess);
-            }else if(this.props.auth.message){
-                Alert.alert("Registration Successfull",this.props.auth.message);
-            }
-            this.setState({
-                userName:"",
-                email:"",
-                password:""
-            })
-        }
     }
+
+    getGalleryImage = async () => {
+        var selectedImage  = await getImageFromGallery(width, heigth);
+        if(selectedImage){
+            if(!selectedImage.error){
+                this.setState({
+                    imageUrl: selectedImage.imageUrl,
+                    blob: selectedImage.blob
+                });
+    
+            }else{
+                console.log("Error", selectedImage.error);
+            }
+        }else{
+            console.log("Image not selected");
+        }
+        
+    } 
 
     render() {
         return (
@@ -78,18 +77,27 @@ class Register extends Component {
 
                     <View style={{marginHorizontal: '5%', marginTop:'10%'}}>
                         <Input
-                            placeholder="Enter Username...."
+                            placeholder="Enter First Name...."
                             leftIcon={{ type: 'font-awesome-5', name: 'user', color: '#11cbd7'}}
                             leftIconContainerStyle={{marginRight: 10}}
-                            onChangeText={(userName) => this.setState({userName})}
-                            value={this.state.userName}
-                            label='USER NAME : '
-                            errorMessage = {this.state.errors.userName}
+                            onChangeText={(firstName) => this.setState({firstName})}
+                            value={this.state.firstName}
+                            label='FIRST NAME : '
                             labelStyle={{color: 'white'}}
                             placeholderTextColor='white'
                             style={{color: 'white'}}
                         />
-                        
+                        <Input
+                            placeholder="Enter Last Name...."
+                            leftIcon={{ type: 'font-awesome-5', name: 'user', color: '#11cbd7'}}
+                            leftIconContainerStyle={{marginRight: 10}}
+                            onChangeText={(lastName) => this.setState({lastName})}
+                            value={this.state.lastName}
+                            label='LAST NAME : '
+                            labelStyle={{color: 'white'}}
+                            placeholderTextColor='white'
+                            style={{color: 'white'}}
+                        />
                         <Input
                             placeholder="Enter Email...."
                             leftIcon={{ type: 'font-awesome-5', name: 'envelope', color: '#11cbd7'}}
@@ -115,11 +123,25 @@ class Register extends Component {
                             placeholderTextColor='white'
                             style={{color: 'white'}}
                         />
+                        <View style={{width: '45%', paddingLeft: '2%', marginTop:'5%', marginBottom:'3%'}}>
+                            <Button
+                                title="Upload Image"
+                                onPress={this.getGalleryImage}
+                                buttonStyle={{backgroundColor: '#85603f', borderRadius: 28}}
+                                titleStyle={{color: "white", fontWeight: "bold", paddingHorizontal: '5%'}}
+                            />
+                        </View>
+                        <View style={{marginBottom:'10%', marginLeft:'6%'}}>
+                            <Text>
+                                {!this.state.imageUrl && <Text style={{marginTop:'2%', color:'orange'}}>No image selected</Text>}
+                                {this.state.imageUrl && <Text style={{marginTop:'2%', color:'green'}}>Image selected successfully</Text>}
+                            </Text>
+                        </View>
 
                         <View style={{marginHorizontal: '5%', marginVertical: '5%'}}>
                             <Button
                                 onPress = {() => this.handleSubmit()}
-                                title="Register User"
+                                title="Update User"
                                 titleStyle={{marginLeft: '5%'}}
                                 icon={
                                     <Icon
@@ -163,11 +185,4 @@ const styles = StyleSheet.create({
       }
 });
 
-const mapStateToProps = (state, ownProps)=>{
-    return({
-        ...ownProps,
-        auth: state.Auth
-    })
-
-}
-export default connect(mapStateToProps, {signUp})(Register); 
+export default UpdateUser; 
