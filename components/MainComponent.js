@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -12,6 +13,7 @@ import SpecieSight from './SpecieSight';
 import AddSighting from './AddSighting';
 import Register from './forms/RegisterComponent'
 import Login from './forms/LoginComponent'
+import {setLoginStatus}from '../redux/actions/auth';
 const Tab = createBottomTabNavigator();
 
 const ProfileNavigator = createStackNavigator();
@@ -244,7 +246,10 @@ function HomeNavigatorScreen() {
 
 
 class Main extends Component {
-
+    componentDidMount= async()=>{
+        await this.props.setLoginStatus();
+        
+    }
   render() {
 
     return (
@@ -345,4 +350,4 @@ class Main extends Component {
   }
 }
 
-export default Main; 
+export default connect(null,{setLoginStatus})(Main); 

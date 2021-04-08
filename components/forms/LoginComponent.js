@@ -52,6 +52,7 @@ class Login extends Component {
                 Alert.alert("Login failed",this.props.auth.errMess);
             }else if(this.props.auth.message){
                 Alert.alert("Login Successfull",this.props.auth.message);
+                this.props.navigation.navigate('HOME');
             }
             this.setState({
                 userName:"",
