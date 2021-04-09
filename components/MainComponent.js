@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -12,6 +13,7 @@ import SpecieSight from './SpecieSight';
 import AddSighting from './AddSighting';
 import Register from './forms/RegisterComponent'
 import Login from './forms/LoginComponent'
+import {setLoginStatus}from '../redux/actions/auth';
 const Tab = createBottomTabNavigator();
 
 const ProfileNavigator = createStackNavigator();
@@ -244,7 +246,10 @@ function HomeNavigatorScreen() {
 
 
 class Main extends Component {
-
+    componentDidMount= async()=>{
+        await this.props.setLoginStatus();
+        
+    }
   render() {
 
     return (
@@ -306,23 +311,25 @@ class Main extends Component {
                     }}
                     >
                 </Tab.Screen>
-                <Tab.Screen
-                    name = "Ratification"
-                    component = {RatificationNavigatorScreen}
-                    options = {{
-                        title: 'Ratification',
-                        tabBarIcon: ({ color: tintColor, focused }) => (
-                            <Icon
-                            name='check-circle'
-                            type='font-awesome-5'    
-                            size={focused ? 30 : 24}        
-                            iconStyle={{ color: tintColor }}
-                            />
-                        )
-                    }}
-                    >
-                </Tab.Screen>
-                <Tab.Screen
+                {(this.props.auth.userId)&&
+                <>
+                    <Tab.Screen
+                        name = "Ratification"
+                        component = {RatificationNavigatorScreen}
+                        options = {{
+                            title: 'Ratification',
+                            tabBarIcon: ({ color: tintColor, focused }) => (
+                                <Icon
+                                name='check-circle'
+                                type='font-awesome-5'    
+                                size={focused ? 30 : 24}        
+                                iconStyle={{ color: tintColor }}
+                                />
+                            )
+                        }}
+                        >
+                    </Tab.Screen>
+                    <Tab.Screen
                     name = "Profile"
                     component = {ProfileNavigatorScreen}
                     options = {{
@@ -338,11 +345,17 @@ class Main extends Component {
                     }}
                     >
                 </Tab.Screen>
-                
+                </>}
             </Tab.Navigator>          
         </NavigationContainer>
     );
   }
 }
+const mapStateToProps = (state, ownProps)=>{
+    return({
+        ...ownProps,
+        auth: state.Auth
+    })
 
-export default Main; 
+}
+export default connect(mapStateToProps,{setLoginStatus})(Main); 

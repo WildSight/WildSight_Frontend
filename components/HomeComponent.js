@@ -5,6 +5,7 @@ import { Button, Icon } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 import {Loading} from './LoadingComponent';
 import PTRView from 'react-native-pull-to-refresh';
+import {signOut} from '../redux/actions/auth';
 
 class Home extends Component {
 
@@ -107,7 +108,7 @@ class Home extends Component {
                             {/* -------------------------------------------------- */}
                             {/* If user not logged In */}
                             
-                            {!(this.state.loggedIn) && <>
+                            {!(this.props.auth.userId) && <>
                                 <Button
                                 onPress={() => this.props.navigation.navigate('REGISTER USER')}
                                 title='Register User'
@@ -150,7 +151,7 @@ class Home extends Component {
 
                         {/* -------------------------------------------------- */}
                             {/*If logged in*/}
-                            {(this.state.loggedIn) &&<><Button
+                            {(this.props.auth.userId) &&<><Button
                                 onPress={() => this.props.navigation.navigate('ADD SIGHTING')}
                                 title='ADD SIGHTING'
                                 icon={
@@ -169,6 +170,7 @@ class Home extends Component {
                                 containerStyle={{marginHorizontal: '15%', marginTop:'5%', marginBottom:'2%'}}
                             />
                             <Button
+                                onPress={async() => this.props.signOut({token:this.props.auth.userId})}
                                 title='LOGOUT'
                                 icon={
                                     <Icon
@@ -245,9 +247,7 @@ const styles = StyleSheet.create({
       },
       scrollView: {
         flex: 1,
-        backgroundColor: '#00000099',
-        //alignItems: 'center',
-        //justifyContent: 'center',
+        backgroundColor: '#00000099'
       },
 });
 
@@ -258,4 +258,4 @@ const mapStateToProps = (state, ownProps)=>{
     })
 
 }
-export default connect(mapStateToProps,{})(Home); 
+export default connect(mapStateToProps,{signOut})(Home); 

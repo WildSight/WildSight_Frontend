@@ -61,6 +61,7 @@ class Register extends Component {
                 Alert.alert("Registration failed",this.props.auth.errMess);
             }else if(this.props.auth.message){
                 Alert.alert("Registration Successfull",this.props.auth.message);
+                this.props.navigation.navigate('HOME');
             }
             this.setState({
                 userName:"",
