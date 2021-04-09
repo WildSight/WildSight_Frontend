@@ -55,10 +55,11 @@ class LocationSight extends Component {
         }
     }
 
-    onMonthValueChange(value) {
+    onMonthValueChange = async (value) => {
         this.setState({
           month: value
         });
+
     }
 
     openSettingApp = () => {
@@ -160,13 +161,7 @@ class LocationSight extends Component {
                 location: location
             });
 
-        }
-
-
             ToastAndroid.show("Preparing Grid....", ToastAndroid.SHORT);
-
-            var latitude = this.state.latitude;
-            var longitude = this.state.longitude;
 
             await this.props.getCustomGrid(latitude.toString(), longitude.toString());
             
@@ -188,9 +183,8 @@ class LocationSight extends Component {
 
             this.getData(this.state.sightings);
 
-            this.setState({
-                type: "Custom"
-            });
+        }
+            
     }
 
     getLoction = async () => {
@@ -293,9 +287,9 @@ class LocationSight extends Component {
         }
 
 
-        if ((this.state.location || this.state.type === "Custom") || (this.state.type === "Current" && this.state.location)){
+        if ((this.state.location || this.state.type === "Custom")){
             
-                if((this.state.location || this.state.type === "Custom") || inChandigarh()){
+                // if((this.state.location || this.state.type === "Custom") || inChandigarh()){
 
                     var list;
                     if(this.props.sightings.isLoading || this.props.species.isLoading){
@@ -410,8 +404,9 @@ class LocationSight extends Component {
                         </View>
                         </ImageBackground>
                     </View>
-            );}
-            else{
+            );
+        // }
+            /*else{
                 return (
                     <View style={styles.container}>
                         <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
@@ -419,7 +414,7 @@ class LocationSight extends Component {
                         </ImageBackground>
                     </View>
                 );
-            }
+            }*/
         }
         else
         {   

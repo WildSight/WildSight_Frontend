@@ -1,14 +1,17 @@
 import React, {Component} from 'react';
+import { Alert } from 'react-native';
 import { View, Image, ImageBackground, Text, StyleSheet, FlatList} from 'react-native';
 import { Icon, Input, SearchBar, ListItem } from 'react-native-elements';
 import SearchableDropdown from 'react-native-searchable-dropdown';
 import { connect } from "react-redux";
 import {fetchSpecies, searchSpecie} from '../redux/actions/specie';
+import {fetchSingleGrid} from "../redux/actions/singlegrid";
 import {Loading} from './LoadingComponent';
 
 const  mapStateToProps = (state) => {
     return{
-        species: state.species
+        species: state.species,
+        singlegrids: state.singlegrids,
     };
 }
 
@@ -16,7 +19,8 @@ const mapDispatchToProps = dispatch => {
     
     return {
         fetchSpecies: () => dispatch(fetchSpecies()),
-        searchSpecie: (birdFilter) => dispatch(searchSpecie(birdFilter))
+        searchSpecie: (birdFilter) => dispatch(searchSpecie(birdFilter)),
+        fetchSingleGrid: (gridId) => dispatch(fetchSingleGrid(gridId))
     };
 }
 
@@ -31,6 +35,10 @@ class SpecieSight extends Component {
             birdFilter: '',
         }
     }
+
+    /*componentDidMount(){
+        Alert.alert(null, this.props.Auth.userId.toString());
+    }*/
 
     updateSearch = async (birdFilter) => {
 
@@ -59,11 +67,13 @@ class SpecieSight extends Component {
 
     render() {
 
-        const finalFilter = (filter) => {
+        const finalFilter = (filter, birdId) => {
             this.setState({
                 birdFilter: filter,
                 birds: []
-            })
+            });
+
+
         }
 
         function renderListItem({item, index}){
@@ -73,7 +83,7 @@ class SpecieSight extends Component {
                 <ListItem
                     key={index}
                     pad = {10}
-                    onPress={() => finalFilter(name)}
+                    onPress={() => finalFilter(name, birdId)}
                 >   
                     <ListItem.Content>
                         <ListItem.Title style={{fontWeight: 'bold', color: 'black'}}>

@@ -18,7 +18,8 @@ let screenHeight = 2*Dimensions.get('window').height;
 
 const  mapStateToProps = (state) => {
     return{
-        species: state.species
+        species: state.species,
+        Auth: state.auth
     };
 }
 
