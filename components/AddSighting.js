@@ -1,14 +1,16 @@
 import React, {Component} from 'react';
 import { View, ScrollView, Text, Alert, Dimensions, TouchableOpacity, ToastAndroid, FlatList, SectionList} from 'react-native';
 import { Button, Image, Input, Icon, BottomSheet, ListItem} from 'react-native-elements';
-import DateTimePicker from "@react-native-community/datetimepicker";
+//import DateTimePicker from "@react-native-community/datetimepicker";
 import Moment from 'moment';
 import MapView, {Marker} from 'react-native-maps';
 import {openSettingApp, getImageFromGallery, getImageFromCamera, getUserLoction} from './commonComponents/permissions';
 import { connect } from "react-redux";
 import {fetchSpecies, searchSpecie} from '../redux/actions/specie';
+import {postRawSighting} from '../redux/actions/rawsighting';
 import {Loading} from './LoadingComponent';
 import { SafeAreaView } from 'react-native';
+import {DatePicker} from 'native-base';
 
 
 
@@ -19,7 +21,8 @@ let screenHeight = 2*Dimensions.get('window').height;
 const  mapStateToProps = (state) => {
     return{
         species: state.species,
-        Auth: state.auth
+        rawsightings: state.rawsightings,
+        Auth: state.Auth
     };
 }
 
@@ -27,7 +30,8 @@ const mapDispatchToProps = dispatch => {
     
     return {
         fetchSpecies: () => dispatch(fetchSpecies()),
-        searchSpecie: (birdFilter) => dispatch(searchSpecie(birdFilter))
+        searchSpecie: (birdFilter) => dispatch(searchSpecie(birdFilter)),
+        postRawSighting: (rawSighting, token) => dispatch(postRawSighting(rawSighting, token))
     };
 }
 
@@ -47,9 +51,9 @@ class AddSighting extends Component {
             blob: null,
             showDatePicker: false,
             date: new Date(),
-            time: new Date(),
-            show: false,
-            mode: "date",
+            //time: new Date(),
+            //show: false,
+            //mode: "date",
             dateTime: '',
             errorMsg: null,
             latitude: 30.73629,
@@ -99,10 +103,33 @@ class AddSighting extends Component {
 
     }
 
-    handleSubmit = (Sighting) => {
+    handleSubmit = () => {
 
         if(this.formValidation())
-            Alert.alert("Form Submitted", JSON.stringify(Sighting));
+        {
+            var rawSighting = {};
+
+            rawSighting.image = this.state.imageUrl
+            rawSighting.user = this.props.Auth.username.toString();
+            rawSighting.count = this.state.birdCount;
+            rawSighting.species = this.state.name.toString();
+            rawSighting.date_time = Moment(this.state.date).format('YYYY-MM-DD HH:mm');
+            rawSighting.location_longitude = parseFloat(this.state.longitude.toFixed(6));
+            rawSighting.location_latitude = parseFloat(this.state.latitude.toFixed(6));
+
+            this.props.postRawSighting(rawSighting, this.props.Auth.token);
+        }
+        else{
+            Alert.alert(null, this.state.imageUrl);
+        }
+    }
+
+    dateSelect(Date){
+        
+        this.setState({
+            date: Date,
+            dateString: Date.toString()
+        })
     }
 
     getCameraImage= async()=>{
@@ -334,59 +361,27 @@ class AddSighting extends Component {
                      <View style={{
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    margin: 20,
+                                    margin: 10,
                                 }}>
-                                    <Text style={{
-                                        fontWeight: 'bold',
-                                        paddingBottom: '3%'
-                                    }}>
-                                        SIGHTING DATE TIME
-                                    </Text>
-                                    <TouchableOpacity style={{flex: 1}}
-                                        style={{
-                                            padding: 15,
-                                            borderColor: "#158467",
-                                            borderWidth: 2,
-                                            flexDirection: "row",
-                                            borderRadius: 20
-                                        }}
-                                        
-                                        onPress={() => this.setState({ show: true, mode: 'date' })}
-                                    >
-                                    <Icon type='font-awesome-5' name='calendar-alt' color="#158467" style={{paddingRight: 10}} />
-                                    <Text >
-                                        {' ' + Moment(this.state.date).format('DD-MMM-YYYY h:mm A') }
-                                    </Text>
-                                    </TouchableOpacity>
-                                        {this.state.show && (
-                                            <DateTimePicker
-                                                value={this.state.date}
-                                                mode={this.state.mode}
-                                                display="default"
-                                                minimumDate={new Date()}
-                                                onChange={(selected, value) => {
-                                                    if (value !== undefined) {
-                                                    this.setState({
-                                                        show: this.state.mode === "time" ? false : true,
-                                                        mode: "time",
-                                                        date: new Date(selected.nativeEvent.timestamp),
-                                                        time: new Date(selected.nativeEvent.timestamp),
-                                                        dateTime: Moment(new Date(selected.nativeEvent.timestamp)).format('DD-MMM-YYYY h:mm A').toString(),
-                                                        dateString: (new Date(selected.nativeEvent.timestamp)).toString()
-        
-                                                    });
-                                                    } else {
-                                                    this.setState({ show: false });
-                                                    }
-                                                }}
-                                            />
-                                        )}
-                                    </View>
+                        <DatePicker
+                            defaultDate={new Date()}
+                            locale={"en"}
+                            timeZoneOffsetInMinutes={undefined}
+                            modalTransparent={false}
+                            animationType={"fade"}
+                            androidMode={"default"}
+                            placeHolderText="SELECT DATE"
+                            textStyle={{ color: "black", fontWeight: 'bold', borderRadius: 30, backgroundColor: '#c6f1e7' }}
+                            placeHolderTextStyle={{ color: "black", fontWeight: 'bold', borderRadius: 30, backgroundColor: '#c6f1e7' }}
+                            onDateChange={(date) => this.dateSelect(date)}
+                            disabled={false}
+                        />
+                    </View>
                 </View>
                 <Text style={{color: 'red', textAlign: 'center'}}>{this.state.errors.dateString}</Text>
                 <View style={{marginHorizontal: '5%', marginVertical: '5%'}}>
                 <Button
-                        onPress = {() => this.handleSubmit(this.state)}
+                        onPress = {() => this.handleSubmit()}
                         title=" Submit Sighting"
                         titleStyle={{marginLeft: '5%'}}
                         icon={
@@ -399,7 +394,8 @@ class AddSighting extends Component {
                         }
                         buttonStyle={{
                             backgroundColor: '#85603f',
-                            borderRadius: 28
+                            borderRadius: 28,
+                            marginBottom: '5%'
                         }}
                         />
                 </View>

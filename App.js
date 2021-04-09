@@ -5,6 +5,8 @@ import { ConfigureStore } from './redux/configureStore';
 import { PersistGate } from 'redux-persist/es/integration/react'
 import {Loading} from './components/LoadingComponent';
 
+console.disableYellowBox = true;
+
 const {persistor, store }= ConfigureStore();
 
 export default class App extends React.Component {
@@ -12,7 +14,6 @@ export default class App extends React.Component {
     return (
       <Provider store={store} >
         <PersistGate
-          //loading={<Loading text="Loading...." color='red'/>}
           persistor={persistor}
         >
         <Main />

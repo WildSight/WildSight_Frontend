@@ -12,6 +12,7 @@ const  mapStateToProps = (state) => {
     return{
         species: state.species,
         singlegrids: state.singlegrids,
+        Auth: state.Auth
     };
 }
 
@@ -36,9 +37,9 @@ class SpecieSight extends Component {
         }
     }
 
-    /*componentDidMount(){
-        Alert.alert(null, this.props.Auth.userId.toString());
-    }*/
+    componentDidMount(){
+         Alert.alert(null, this.props.Auth.username.toString());
+     }
 
     updateSearch = async (birdFilter) => {
 

@@ -330,18 +330,18 @@ class Main extends Component {
                         >
                     </Tab.Screen>
                     <Tab.Screen
-                    name = "Profile"
-                    component = {ProfileNavigatorScreen}
-                    options = {{
-                        title: 'Profile',
-                        tabBarIcon: ({ color: tintColor, focused }) => (
-                            <Icon
-                            name='user-alt'
-                            type='font-awesome-5'            
-                            size={focused ? 30 : 24}
-                            iconStyle={{ color: tintColor }}
-                            />
-                        ) 
+                        name = "Profile"
+                        component = {ProfileNavigatorScreen}
+                        options = {{
+                            title: 'Profile',
+                            tabBarIcon: ({ color: tintColor, focused }) => (
+                                <Icon
+                                name='user-alt'
+                                type='font-awesome-5'            
+                                size={focused ? 30 : 24}
+                                iconStyle={{ color: tintColor }}
+                                />
+                            ) 
                     }}
                     >
                 </Tab.Screen>

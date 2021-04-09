@@ -5,9 +5,12 @@ import {species} from './reducers/species';
 import {grids} from './reducers/grids';
 import {sightings} from './reducers/sightings';
 import {birds} from './reducers/birds';
+import {rawsightings} from './reducers/rawsightings';
 import { persistStore, persistCombineReducers } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Auth} from './reducers/auth'
+
+
 const config = {
     key: 'root',
     storage: AsyncStorage,
@@ -21,6 +24,7 @@ const config = {
             sightings,
             grids,
             birds,
+            rawsightings,
             Auth
         }),
         applyMiddleware(thunk, logger)
