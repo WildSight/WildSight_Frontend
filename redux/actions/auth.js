@@ -47,15 +47,11 @@ export const signIn = (userDetails)=> async(dispatch, getState)=>{
 export const signOut = (userDetails) => async (dispatch,getState) =>{
     const token = userDetails.token;
     try{
-        console.log("hi");
+        const res = await authRecord(token).post('/auth/logout');
         await AsyncStorage.removeItem('loginData');
-        const res = await authRecord(token).post('auth/logout');
-        
-        console.log(res);
-        // dispatch({type:LOGOUT_USER, payload:{msg:"You have been logged out successfully"}});
+        dispatch({type:LOGOUT_USER, payload:{msg:"You have been logged out successfully"}});
     }catch(e){
-        console.log("err", e);
-        // dispatch({type:AUTH_FAILED, payload:{errmess:"Failed to logout"}})
+        dispatch({type:AUTH_FAILED, payload:{errmess:"Failed to logout"}})
     }   
 }
 
