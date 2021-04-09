@@ -91,7 +91,6 @@ function CardTemplate (props){
                     icon={<Icon name='chevron-down' type="font-awesome-5"  color='white' />}
                     buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginTop: 5}}
                     title='Downvote'  onPress={ () => incrementCount(item.downvotes)}/>
-                    
                 </View>
             </Card>
             

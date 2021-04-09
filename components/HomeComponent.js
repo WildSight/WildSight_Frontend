@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import{connect} from 'react-redux';
-import { View, RefreshControl, Image, StatusBar, ImageBackground, Text, StyleSheet} from 'react-native';
+import { View, RefreshControl, Image, StatusBar,Alert, ImageBackground, Text, StyleSheet} from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 import {Loading} from './LoadingComponent';
@@ -45,6 +45,15 @@ class Home extends Component {
             refreshing: false,
             loggedIn:this.props.auth.userId?true:false
         });
+    }
+    logoutUser = async()=>{
+        await this.props.signOut({token:this.props.auth.token});
+        if(this.props.auth.errMess){
+            Alert.alert("LogOut failed",this.props.auth.errMess);
+        }else if(this.props.auth.message){
+            Alert.alert("LogOut Successfull",this.props.auth.message);
+            // this.props.navigation.navigate('HOME');
+        }
     }
 
     componentDidMount(){
@@ -170,7 +179,7 @@ class Home extends Component {
                                 containerStyle={{marginHorizontal: '15%', marginTop:'5%', marginBottom:'2%'}}
                             />
                             <Button
-                                onPress={async() => this.props.signOut({token:this.props.auth.userId})}
+                                onPress={async() => this.logoutUser()}
                                 title='LOGOUT'
                                 icon={
                                     <Icon
