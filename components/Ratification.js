@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import { View, Image, ImageBackground, Text, StyleSheet, FlatList} from 'react-native';
+import { View, Image, ImageBackground, Text, StyleSheet, FlatList, Dimensions} from 'react-native';
 import {ListItem, Icon, BottomSheet, Button, Card, Avatar} from 'react-native-elements';
 import CardTemplate from './commonComponents/lists';
+import MapView, {Marker} from 'react-native-maps';
 import {getUnratifiedSights, VoteSighting} from '../redux/actions/unratified_sightings';
 import {fetchBird} from '../redux/actions/bird';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
+import { Alert } from 'react-native';
 
 const Tempdata = [
   {id: 1, species: "Sparrow", category: "Common", count: 100, image: "./images/sparrow.jpg", location:"Bird Island", upvotes:15, downvotes:5},
@@ -24,7 +26,10 @@ class Ratification extends Component {
     super(props);
     this.state = {
         limit:10,
-        skip:0
+        skip:0,
+        sheetVisible: false,
+        latitude: 30.73629,
+        longitude:  76.7884,
     }
 }
   componentDidMount= async()=>{
@@ -78,7 +83,11 @@ class Ratification extends Component {
                         <Icon name='eye' type="font-awesome-5" color='white' size={15}
                             iconStyle={{marginRight: 10}} />{item.count}
                     </ListItem.Subtitle>
-                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#fff'}}>
+                    <ListItem.Subtitle onPress={() => this.setState({
+                      sheetVisible: !this.state.sheetVisible,
+                      latitude: parseFloat(item.location_latitude),
+                      longitude: parseFloat(item.location_longitude)
+                    })} style={{ fontWeight: 'bold', marginVertical: '5%', color: '#fff'}}>
                         <Icon name='map-marker-alt' type="font-awesome-5"  color='white' size={15}
                             iconStyle={{marginRight: 10}} />{item.location_latitude +", "+ item.location_longitude}
                     </ListItem.Subtitle>
@@ -114,6 +123,9 @@ class Ratification extends Component {
   }
 
     render() {
+
+      let screenHeight = 2*Dimensions.get('window').height;
+
       if(this.props.UnratifiedSightings.data){
         let Unratified_Sights = this.props.UnratifiedSightings.data;
         // let data = []
@@ -129,13 +141,47 @@ class Ratification extends Component {
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                       <View style={{height:'100%', backgroundColor: "#000000aa"}}>
                         <FlatList
-                        data={Unratified_Sights}
-                        renderItem={this.renderCardTempelate}
-                        keyExtractor={item =>{
-                        return item.id.toString()}
+                          data={Unratified_Sights}
+                          renderItem={this.renderCardTempelate}
+                          keyExtractor={item =>{
+                          return item.id.toString()}
                         }
                         style={{marginBottom: 30}}
                         /> 
+                        <BottomSheet isVisible={this.state.sheetVisible} >
+                                <View style={{flex: 1, backgroundColor: 'white'}}>
+                                <Text style={{textAlign: 'right', marginBottom: '0%'}}>
+                                    <Icon 
+                                        name='times-circle'
+                                        type='font-awesome-5' 
+                                        onPress={() => this.setState({sheetVisible: false})}
+                                        size={30}
+                                        />
+                                    </Text>
+                                <MapView 
+                                    region={{
+                                        latitude: this.state.latitude,
+                                        longitude: this.state.longitude,
+                                        latitudeDelta: 0.005,
+                                        longitudeDelta: 0.005
+                                    }}
+                                    style={{height: screenHeight-500, width: Dimensions.get('window').width}}
+                                >
+                                    {this.state.latitude && this.state.longitude
+                                    ?
+                                    <Marker 
+                                        coordinate={{
+                                            latitude: this.state.latitude,
+                                            longitude: this.state.longitude
+                                        }}
+                                        title={'Desired Location'}
+                                    />
+                                    :
+                                    <View></View>
+                                    }
+                                </MapView>
+                                </View>
+                            </BottomSheet>
                       </View>
                 </ImageBackground>
             </View>
