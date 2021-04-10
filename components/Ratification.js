@@ -97,10 +97,10 @@ class Ratification extends Component {
                 borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
                 marginTop: '3%'
             }} style={{justifyContent:'center', backgroundColor: '#fff'}}>
-                <Card.Title style={{fontSize:34}}>{item.name}</Card.Title>
+                <Card.Title style={{fontSize:24}}>{item.name}</Card.Title>
                 {item.image &&
                   <View style={{marginBottom: 10, flex:1,marginLeft:'auto', marginRight:'auto' }}>
-                    <Avatar containerStyle={{justifyContent:'center'}}  rounded size={'xlarge'} source={{uri:item.image}}/>
+                    <Avatar containerStyle={{justifyContent:'center'}} size={'xlarge'} source={{uri:item.image}}/>
                 </View>
                 }
 

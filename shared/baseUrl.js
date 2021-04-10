@@ -1,4 +1,4 @@
-const baseUrl = 'http://<your_ip>:<port_no>/api/';
+const baseUrl = 'http://192.168.43.185:80/api/';
 import axios from 'axios';
 
 const record =  axios.create({
