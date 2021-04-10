@@ -33,25 +33,55 @@ class Ratification extends Component {
     this.setState({data})
   }
 
-  modifySighting = (sightingId)=>{
 
-
-  }
   upvoteSighting = async(sightingId)=>{
     //send bird id, usertoken, voteType
     const pk=sightingId;
     const token = this.props.auth.token;
     const vote="up";
-    const data= {pk, token, vote};
-    await this.props.VoteSighting(data);
+    const Votedata= {pk, token, vote};
+    await this.props.VoteSighting(Votedata);
+    let prev_data= this.state.data;
+    let new_data = this.props.Votes.data;
+    if(new_data){
+      new_data= new_data[0];
+    }
+
+    for(var i=0;i<prev_data.length;i++){
+      if(prev_data[i].id===pk){
+        const name = prev_data[i].name
+        prev_data[i] = {...new_data, name}
+        this.setState({
+          data: prev_data
+        })
+        break;
+      }
+    }
+    
   }
   downvoteSighting = async(sightingId)=>{
     //sighting_id, usertoken, voteType
     const pk=sightingId;
     const token = this.props.auth.token;
     const vote="down";
-    const data= {pk, token, vote};
-    await this.props.VoteSighting(data);
+    const Votedata= {pk, token, vote};
+    await this.props.VoteSighting(Votedata);
+    let prev_data= this.state.data;
+    let new_data = this.props.Votes.data;
+    if(new_data){
+      new_data= new_data[0];
+    }
+
+    for(var i=0;i<prev_data.length;i++){
+      if(prev_data[i].id===pk){
+        const name = prev_data[i].name
+        prev_data[i] = {...new_data, name}
+        this.setState({
+          data: prev_data
+        })
+        break;
+      }
+    }
   }
 
   renderCardTempelate = (props)=>{
@@ -122,25 +152,16 @@ class Ratification extends Component {
 
       let screenHeight = 2*Dimensions.get('window').height;
 
-      if(this.props.UnratifiedSightings.data){
-        let Unratified_Sights = this.props.UnratifiedSightings.data;
-        // let data = []
-        // for(var i=0;i<Unratified_Sights.length;i++){
-        //   let temporary_id=i;
-        //   let sighting = Unratified_Sights[i];
-        //   let obj = {...sighting, temporary_id}
-        //   data.push(obj);
-        // }
-        // console.log(Unratified_Sights);
+      if(this.state.data){
         return (
             <View style={styles.container}>
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                       <View style={{height:'100%', backgroundColor: "#000000aa"}}>
                         <FlatList
-                          data={Unratified_Sights}
-                          renderItem={this.renderCardTempelate}
-                          keyExtractor={item =>{
-                          return item.id.toString()}
+                        data={this.state.data}
+                        renderItem={this.renderCardTempelate}
+                        keyExtractor={item =>{
+                        return item.id.toString()}
                         }
                         style={{marginBottom: 30}}
                         /> 
@@ -216,7 +237,8 @@ const mapStateToProps = (state, ownProps)=>{
       ...ownProps,
       auth: state.Auth, 
       birds:state.birds,
-      UnratifiedSightings: state.UnratifiedSightings
+      UnratifiedSightings: state.UnratifiedSightings,
+      Votes:state.Votes
   })
 
 }

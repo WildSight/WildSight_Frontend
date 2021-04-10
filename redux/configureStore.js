@@ -32,7 +32,7 @@ const config = {
             UnratifiedSightings,
             Votes
         }),
-        applyMiddleware(thunk, logger)
+        applyMiddleware(thunk)
     );
 
     const persistor = persistStore(store);

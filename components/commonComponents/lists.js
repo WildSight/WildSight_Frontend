@@ -52,17 +52,16 @@ const incrementCount = (val)=>{
 
 function CardTemplate (props){
         const color = '#ffa500'
-        // #ffa500 #5da172
         const {item, index} = props;
 
         return (
             <Card key={index}
             containerStyle={{
-                backgroundColor: '#fab95b',
+                backgroundColor: '#51adcf',
                 borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
                 marginTop: '3%'
             }} style={{justifyContent:'center', backgroundColor: '#fff'}}>
-                <Card.Title style={{fontSize:34}}>{item.name}</Card.Title>
+                <Card.Title style={{fontSize:34}}>{item.species}</Card.Title>
                 <View style={{marginBottom: 10, flex:1,marginLeft:'auto', marginRight:'auto' }}>
                     <Avatar containerStyle={{justifyContent:'center'}}  rounded size={'xlarge'} source={require("../images/sparrow.jpg")} />
                 </View>
@@ -70,7 +69,7 @@ function CardTemplate (props){
                 <View style={{marginBottom: 10}}>
                     <ListItem.Subtitle style={{fontWeight: 'bold', color: '#fff'}}>
                         <Icon name='eye' type="font-awesome-5" color='white' size={15}
-                            iconStyle={{marginRight: 10}} />{item.sightings}
+                            iconStyle={{marginRight: 10}} />{item.count}
                     </ListItem.Subtitle>
                     <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#fff'}}>
                         <Icon name='map-marker-alt' type="font-awesome-5"  color='white' size={15}
@@ -81,7 +80,7 @@ function CardTemplate (props){
                 <View style={{flex:12, justifyContent:'space-between'}}>
                     <Button
                     icon={<Icon name='chevron-up' type="font-awesome-5"  color='white' />}
-                    buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 5}}
+                    buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 5, backgroundColor:"#b37959"}}
                     onPress={()=>incrementCount(item.upvotes)}
                     title='Upvote' />
                     <ListItem.Subtitle  style={{fontWeight: 'bold', color: '#fff', marginLeft:'auto',marginRight:'auto', marginTop:1, marginBottom:1}}>
@@ -89,7 +88,7 @@ function CardTemplate (props){
                     </ListItem.Subtitle>
                     <Button
                     icon={<Icon name='chevron-down' type="font-awesome-5"  color='white' />}
-                    buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginTop: 5}}
+                    buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginTop: 5, backgroundColor:"#b37959"}}
                     title='Downvote'  onPress={ () => incrementCount(item.downvotes)}/>
                 </View>
             </Card>
