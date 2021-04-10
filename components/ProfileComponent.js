@@ -30,7 +30,8 @@ class Profile extends Component {
             userSightings:data
         })
     }
-    renderListTempelate = ()=>{
+    renderListTempelate = (props)=>{
+        const {item, index} = props;
         
         return(
             <ListItem
@@ -41,7 +42,9 @@ class Profile extends Component {
                     marginTop: '3%'}}
                 pad = {30}
             >   
-                <Avatar rounded size={'large'} source={item.image ? {uri: item.image}: require('./images/hodded pithoui.jpg')} icon={{name: 'user', type: 'font-awesome'}}/>
+                {(item.image&&<Avatar rounded size={'large'} source={{uri: item.image}} icon={{name: 'user', type: 'font-awesome'}}/>)||
+                 (<Avatar rounded size={'large'} source={require("./images/Logo.png")} icon={{name: 'user', type: 'font-awesome'}}/>)
+                }
                 <ListItem.Content>
                     <ListItem.Title style={{fontWeight: 'bold', color: '#fff'}}>
                         <Icon name='feather'
@@ -71,7 +74,7 @@ class Profile extends Component {
                     data={this.state.userSightings}
                         renderItem={this.renderListTempelate}
                         keyExtractor={item =>{
-                        return item.temporary_id}
+                        return item.temporary_id.toString()}
                         }
                         style={{marginBottom: 30}}
                         />
@@ -128,13 +131,18 @@ class Profile extends Component {
                 </Card>
                 </View>
                 <View>
-                    {/* {this.getSightingsList()} */}
+                    {this.state.userSightings && this.getSightingsList()}
                 </View>
                 </View>
                 </ImageBackground>
             </View>
         );
         }
+        return(
+            <>
+                <Text>Loading profile</Text>
+            </>
+        )
     }
 }
 
