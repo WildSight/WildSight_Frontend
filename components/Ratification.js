@@ -8,35 +8,29 @@ import {fetchBird} from '../redux/actions/bird';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
 
-const Tempdata = [
-  {id: 1, species: "Sparrow", category: "Common", count: 100, image: "./images/sparrow.jpg", location:"Bird Island", upvotes:15, downvotes:5},
-  {id: 2, species: "Myna", category: "Common", count: 75, image: "./images/sparrow.jpg", location:"Bird Island", upvotes:1, downvotes:25},
-  {id: 3, species: "Hooted Pitoui", category: "Rare", count: 20, image: "./images/sparrow.jpg", location:"Bird Island", upvotes:12, downvotes:1},
-  {id: 4, species: "Robin", category: "Common", count: 110, image: "./images/sparrow.jpg", location:"Bird Island", upvotes:8, downvotes:5},
-  {id: 5, species: "Great Indian Bustard", count: 5, category: "Endangered", image: "./images/sparrow.jpg",location:"Bird Island", upvotes:99, downvotes:14},
-  {id: 6, species: "abcd", category: "Common", count: 89, image: "./images/sparrow.jpg",location:"Bird Island", upvotes:1, downvotes:24},
-  {id: 7, species: "efgh", category: "Rare", count: 30, image: "./images/sparrow.jpg",location:"Bird Island", upvotes:11, downvotes:0},
-  {id: 8, species: "ijkl", category: "Common", count: 98, image: "./images/sparrow.jpg",location:"Bird Island", upvotes:900, downvotes:156}
-];
-
 class Ratification extends Component {
   constructor(props){
     super(props);
     this.state = {
         limit:10,
-        skip:0
+        skip:0,
+        data:[]
     }
 }
   componentDidMount= async()=>{
     const authToken=this.props.auth.token
     await this.props.getUnratifiedSights({token:authToken, limit:this.state.limit, skip:this.state.skip})
-
+    let data = this.props.UnratifiedSightings.data;
+    for(var i=0;i<data.length;i++){
+        await this.props.fetchBird(data[i].species);
+        data[i] = {...data[i], name: this.props.birds.birds.common_name}
+      }
+    this.setState({data})
   }
-  getBirdName = async(id)=>{
-    await this.props.fetchBird(id)
-    console.log(this.props.birds)
-    console.log(this.props.birds.birds.common_name);
-    return "test"
+
+  modifySighting = (sightingId)=>{
+
+
   }
   upvoteSighting = async(sightingId)=>{
     //send bird id, usertoken, voteType
@@ -58,7 +52,9 @@ class Ratification extends Component {
   renderCardTempelate = (props)=>{
     const color = '#ffa500'
         const {item, index} = props;
-        // console.log(this.props.birds);
+        const userId=this.props.auth.userId;
+        if(item.voted_by.includes(userId))
+          return (<></>)
         return (
             <Card key={index}
             containerStyle={{
@@ -66,7 +62,7 @@ class Ratification extends Component {
                 borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
                 marginTop: '3%'
             }} style={{justifyContent:'center', backgroundColor: '#fff'}}>
-                <Card.Title style={{fontSize:34}}>{item.species}</Card.Title>
+                <Card.Title style={{fontSize:34}}>{item.name}</Card.Title>
                 {item.image &&
                   <View style={{marginBottom: 10, flex:1,marginLeft:'auto', marginRight:'auto' }}>
                     <Avatar containerStyle={{justifyContent:'center'}}  rounded size={'xlarge'} source={{uri:item.image}}/>
