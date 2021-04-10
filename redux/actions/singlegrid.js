@@ -4,7 +4,7 @@ const axios = require("axios");
 
 export const fetchSingleGrid = (gridId) => async (dispatch, getState) => {
 
-	console.log("Got fet grid request for gridId"+ gridId);
+	console.log("Got fetch grid request for gridId"+ gridId);
 	dispatch({type: ActionTypes.SINGLE_GRID_LOADING});
 	try {
 		let response = await fetch(baseUrl + "Locations/"+gridId, {
@@ -22,7 +22,7 @@ export const fetchSingleGrid = (gridId) => async (dispatch, getState) => {
 		}
 	} catch (err) {
 		console.log("err", err);
-		dispatch({ type: ActionTypes.BIRD_FAILED, payload: err });
+		dispatch({ type: ActionTypes.SINGLE_GRID_FAILED, payload: err });
 	}
 };
 

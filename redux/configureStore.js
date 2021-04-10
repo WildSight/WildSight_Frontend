@@ -6,6 +6,7 @@ import {grids} from './reducers/grids';
 import {sightings} from './reducers/sightings';
 import {birds} from './reducers/birds';
 import {rawsightings} from './reducers/rawsightings';
+import {singlegrids} from './reducers/singlegrids';
 import { persistStore, persistCombineReducers } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Auth} from './reducers/auth'
@@ -23,6 +24,7 @@ const config = {
             species,
             sightings,
             grids,
+            singlegrids,
             birds,
             rawsightings,
             Auth

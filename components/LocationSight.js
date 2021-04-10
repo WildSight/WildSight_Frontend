@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { View, Alert, Text, ImageBackground, StyleSheet, Linking, FlatList, ToastAndroid, Platform, SafeAreaView, Dimensions} from 'react-native';
 import {ListItem, Icon, BottomSheet, Button, Card, Avatar} from 'react-native-elements';
-import MapView, {Marker, Polygon, Polyline} from 'react-native-maps';
+import MapView, {Marker, Polygon} from 'react-native-maps';
 import {Loading} from './LoadingComponent';
 import {Picker} from 'native-base';
 import * as IntentLauncher from 'expo-intent-launcher';
@@ -387,6 +387,8 @@ class LocationSight extends Component {
                                 itemStyle={{fontWeight: 'bold'}}
                                 selectedValue={this.state.month}
                                 onValueChange={this.onMonthValueChange.bind(this)}
+                                textStyle={{color: 'white'}}
+
                             >
                                 <Picker.Item label="January" value={1} />
                                 <Picker.Item label="February" value={2} />
@@ -401,6 +403,7 @@ class LocationSight extends Component {
                                 <Picker.Item label="November" value={11} />
                                 <Picker.Item label="December" value={12} />
                             </Picker>
+                           
                         </View>
                         </ImageBackground>
                     </View>

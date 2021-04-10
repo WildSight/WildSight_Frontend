@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import { View, ImageBackground, Text, Alert, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, ImageBackground, Text, Alert, StyleSheet, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import { Button, Image, Input, Icon} from 'react-native-elements';
 import {signIn} from '../../redux/actions/auth';
+import { ScrollView } from 'react-native-gesture-handler';
 
 class Login extends Component {
     constructor(props){
@@ -63,7 +64,7 @@ class Login extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
+            <KeyboardAvoidingView style={styles.container}>
                 <ImageBackground source={require('../images/wild2.png')} style={styles.image}>
                     <View style={{height:'100%', backgroundColor: "#000000aa"}}>
                         <View style={{marginHorizontal: '5%', marginTop:'40%'}}>
@@ -118,7 +119,7 @@ class Login extends Component {
 
                     </View>
                 </ImageBackground>
-            </View>
+            </KeyboardAvoidingView>
         );
     }
 }
