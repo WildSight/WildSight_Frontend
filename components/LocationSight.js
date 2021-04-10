@@ -105,6 +105,7 @@ class LocationSight extends Component {
                     spec.Number_of_sightings = sightings[j].Number_of_sightings;
                     spec.avgSightings = Math.floor(spec.Count/spec.Number_of_sightings);
                     spec.id = i;
+                    spec.image = species[i].image
 
                     data.push(spec);
                     spec = {};
@@ -252,7 +253,7 @@ class LocationSight extends Component {
                         marginTop: '3%'}}
                     pad = {30}
                 >   
-                    <Avatar rounded size={'large'} source={require("./images/sparrow.jpg")} icon={{name: 'user', type: 'font-awesome'}}/>
+                    <Avatar rounded size={'large'} source={item.image ? {uri: item.image}: require('./images/hodded pithoui.jpg')} icon={{name: 'user', type: 'font-awesome'}}/>
                     <ListItem.Content>
                         <ListItem.Title style={{fontWeight: 'bold', color: '#fff'}}>
                             <Icon name='feather'
