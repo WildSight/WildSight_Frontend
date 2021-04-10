@@ -2,9 +2,7 @@ import React, { Component } from 'react'
 import { Text, View } from 'react-native'
 import {ListItem, Icon, BottomSheet, Button, Card, Avatar} from 'react-native-elements';
 import { block } from 'react-native-reanimated';
-const incrementCount = (val)=>{
-    console.log(val+1);
-}
+
 // const obj = ()=>{
 //     return(
 //         <>

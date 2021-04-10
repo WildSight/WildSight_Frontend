@@ -12,7 +12,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Auth} from './reducers/auth'
 import {UnratifiedSightings}from './reducers/unratified_sightings'
 import {Votes} from './reducers/voting';
-
+import {UserProfile} from './reducers/userProfile';
+import {UserSightings} from './reducers/userSightings';
 const config = {
     key: 'root',
     storage: AsyncStorage,
@@ -30,7 +31,9 @@ const config = {
             rawsightings,
             Auth, 
             UnratifiedSightings,
-            Votes
+            Votes,
+            UserProfile,
+            UserSightings
         }),
         applyMiddleware(thunk)
     );
