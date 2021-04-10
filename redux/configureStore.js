@@ -10,7 +10,8 @@ import {singlegrids} from './reducers/singlegrids';
 import { persistStore, persistCombineReducers } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Auth} from './reducers/auth'
-
+import {UnratifiedSightings}from './reducers/unratified_sightings'
+import {Votes} from './reducers/voting';
 
 const config = {
     key: 'root',
@@ -27,7 +28,9 @@ const config = {
             singlegrids,
             birds,
             rawsightings,
-            Auth
+            Auth, 
+            UnratifiedSightings,
+            Votes
         }),
         applyMiddleware(thunk, logger)
     );
