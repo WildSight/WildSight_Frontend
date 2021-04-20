@@ -97,8 +97,7 @@ class Profile extends Component {
                 <Card key={1}
                     containerStyle={{
                         backgroundColor: '#fab95b',
-                        borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
-                        marginTop: '3%'
+                        borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%'
                     }} style={{justifyContent:'center', backgroundColor: '#fff'}}>
                     <View style={{marginBottom: 10,marginLeft:'auto', marginRight:'auto' }}>
                         <Avatar containerStyle={{justifyContent:'center', borderColor:'#000', borderWidth:2}}  rounded size={'xlarge'} source={require("./images/user.png")} />
@@ -123,16 +122,19 @@ class Profile extends Component {
                     </View>
 
                     <View style={{ justifyContent:'space-between'}}>
-                        {/* <Button
+                        <Button
+                        onPress={() => this.props.navigation.navigate('UPDATE PROFILE')}
                         icon={<Icon name='user-alt' type="font-awesome-5"  color='white' iconStyle={{marginRight:10}}/>}
                         buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 5}}
-                        title='Update profile' /> */}
+                        title='Update profile' />
                     </View>
                 </Card>
-                </View>
+                {this.state.userSightings && this.getSightingsList()}
                 <View>
-                    {this.state.userSightings && this.getSightingsList()}
+                    
                 </View>
+                </View>
+                
                 </View>
                 </ImageBackground>
             </View>

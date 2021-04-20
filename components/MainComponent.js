@@ -11,9 +11,11 @@ import Profile from './ProfileComponent';
 import Ratification from './Ratification';
 import SpecieSight from './SpecieSight';
 import AddSighting from './AddSighting';
-import Register from './forms/RegisterComponent'
-import Login from './forms/LoginComponent'
+import Register from './forms/RegisterComponent';
+import Login from './forms/LoginComponent';
+import UpdateUserProfile from './forms/UpdateProfileComponent';
 import {setLoginStatus}from '../redux/actions/auth';
+
 const Tab = createBottomTabNavigator();
 
 const ProfileNavigator = createStackNavigator();
@@ -58,6 +60,13 @@ function ProfileNavigatorScreen() {
                     )
                 })}
             />
+
+            <ProfileNavigator.Screen
+                name="UPDATE PROFILE"
+                component={UpdateUserProfile}
+                options= {{ headerTitle: "UPDATE PROFILE", headerTitleStyle: {textAlign: 'left', fontWeight: 'bold'}}}
+            />
+
         </ProfileNavigator.Navigator>
     );
 }
