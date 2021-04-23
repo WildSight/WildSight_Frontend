@@ -4,7 +4,6 @@ import { View, RefreshControl, Image, StatusBar,Alert, ImageBackground, Text, St
 import { Button, Icon } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 import {Loading} from './LoadingComponent';
-import PTRView from 'react-native-pull-to-refresh';
 import {signOut} from '../redux/actions/auth';
 
 class Home extends Component {

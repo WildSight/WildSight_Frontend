@@ -193,11 +193,11 @@ class SpecieSight extends Component {
 
         if(this.props.species.isLoading){
             
-            list = <Loading text='Fetching Results ....' color='black'/>
+            list = <Loading text='' color='blue'/>
                                 
         }
         else if(this.props.species.errMess){
-                    list = <Text>{this.props.species.errMess}</Text>
+                    list = <Text style={{fontWeight: 'bold'}}>{this.props.species.errMess}</Text>
         }
         else{
 
@@ -281,19 +281,19 @@ class SpecieSight extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: "column"
+        flexDirection: "column",
       },
       image: {
         flex: 1,
         resizeMode: "cover",
-        justifyContent: "center"
+        backgroundColor: "#000000aa",
+        justifyContent: "center",
       },
       text: {
         color: "white",
         fontSize: 42,
         fontWeight: "bold",
         textAlign: "center",
-        backgroundColor: "#000000a0"
       },
     searchItemStyle: {
         padding: 10,

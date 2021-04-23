@@ -10,17 +10,20 @@ export const postRawSighting = (rawSighting, token) => async (dispatch) => {
 	
 	var imageUri = rawSighting.image;
 
+	console.log(imageUri, typeof(imageUri))
+
 	let formData = new FormData();
 
 	var date = new Date().getTime().toString();
 
-	formData.append('image', {
-		name: rawSighting.user+"---"+date+".jpg",
-		type: 'image/jpeg',
-		uri: Platform.OS === "android"
-			? imageUri
-			: imageUri.replace('file://', ''),
-	})
+		formData.append('image', {
+			name: rawSighting.user+"---"+date+".jpg",
+			type: 'image/jpeg',
+			uri: Platform.OS === "android"
+				? imageUri
+				: imageUri.replace('file://', ''),
+		})	
+	
 
     formData.append('user', rawSighting.user);
     formData.append('count', rawSighting.count);

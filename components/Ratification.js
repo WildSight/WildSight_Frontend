@@ -93,7 +93,8 @@ class Ratification extends Component {
         return (
             <Card key={index}
             containerStyle={{
-                backgroundColor: '#51adcf',
+                backgroundColor: '#8fd6e1',
+                //backgroundColor: '#51adcf',
                 borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
                 marginTop: '3%'
             }} style={{justifyContent:'center', backgroundColor: '#fff'}}>
@@ -105,29 +106,29 @@ class Ratification extends Component {
                 }
 
                 <View style={{marginBottom: 10}}>
-                    <ListItem.Subtitle style={{fontWeight: 'bold', color: '#fff'}}>
-                        <Icon name='eye' type="font-awesome-5" color='white' size={15}
+                    <ListItem.Subtitle style={{fontWeight: 'bold', color: '#4b778d'}}>
+                        <Icon name='eye' type="font-awesome-5" color='#4b778d' size={15}
                             iconStyle={{marginRight: 10}} />{item.count}
                     </ListItem.Subtitle>
                     <ListItem.Subtitle onPress={() => this.setState({
                       sheetVisible: !this.state.sheetVisible,
                       latitude: parseFloat(item.location_latitude),
                       longitude: parseFloat(item.location_longitude)
-                    })} style={{ fontWeight: 'bold', marginVertical: '5%', color: '#fff'}}>
-                        <Icon name='map-marker-alt' type="font-awesome-5"  color='white' size={15}
+                    })} style={{ fontWeight: 'bold', marginVertical: '5%', color: '#4b778d'}}>
+                        <Icon name='map-marker-alt' type="font-awesome-5"  color='#4b778d' size={15}
                             iconStyle={{marginRight: 10}} />{item.location_latitude +", "+ item.location_longitude}
                     </ListItem.Subtitle>
-                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#fff'}}>
-                        <Icon name='calendar-alt' type="font-awesome-5"  color='white' size={15}
+                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#4b778d'}}>
+                        <Icon name='calendar-alt' type="font-awesome-5"  color='#4b778d' size={15}
                             iconStyle={{marginRight: 10}} />
                             {new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'long', year: 'numeric', hour:'numeric', minute:'numeric'}).format(new Date(Date.parse(item.date_time)))}
                     </ListItem.Subtitle>
-                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#fff'}}>
-                        <Icon name='chevron-up' type="font-awesome-5"  color='white' size={15}
+                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#4b778d'}}>
+                        <Icon name='chevron-up' type="font-awesome-5"  color='#4b778d' size={15}
                             iconStyle={{marginRight: 10}} />{item.upvotes}
                     </ListItem.Subtitle>
-                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#fff'}}>
-                        <Icon name='chevron-down' type="font-awesome-5"  color='white' size={15}
+                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#4b778d'}}>
+                        <Icon name='chevron-down' type="font-awesome-5"  color='#4b778d' size={15}
                             iconStyle={{marginRight: 10}} />{item.downvotes}
                     </ListItem.Subtitle>
                 </View>
@@ -135,13 +136,13 @@ class Ratification extends Component {
                 <View style={{flex:12, justifyContent:'space-between'}}>
                     <Button
                     icon={<Icon name='chevron-up' type="font-awesome-5"  color='white' iconStyle={{marginRight:5}} />}
-                    buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 10, backgroundColor:"#b37959"}}
+                    buttonStyle={{borderRadius: 5, marginLeft: 0, marginRight: 0, marginBottom: 10, backgroundColor:"#b37959"}}
                     onPress={()=>this.upvoteSighting(item.id)}
                     title='Upvote Sighting' />
                 
                     <Button
                     icon={<Icon name='chevron-down' type="font-awesome-5"  color='white' iconStyle={{marginRight:5}} />}
-                    buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginTop: 5, backgroundColor:"#b37959"}}
+                    buttonStyle={{borderRadius: 5, marginLeft: 0, marginRight: 0, marginTop: 5, backgroundColor:"#b37959"}}
                     title='Downvote Sighting'  onPress={ ()=>this.downvoteSighting(item.id)}/>
                 </View>
             </Card>            

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { View, Alert, Text, ImageBackground, StyleSheet, Linking, FlatList, ToastAndroid, Platform, SafeAreaView, Dimensions} from 'react-native';
+import { View, Alert, Text, ScrollView, ImageBackground, StyleSheet, RefreshControl, Linking, FlatList, ToastAndroid, Platform, SafeAreaView, Dimensions} from 'react-native';
 import {ListItem, Icon, BottomSheet, Button, Card, Avatar} from 'react-native-elements';
 import MapView, {Marker, Polygon} from 'react-native-maps';
 import {Loading} from './LoadingComponent';
@@ -51,7 +51,8 @@ class LocationSight extends Component {
             type: "Current",
             polygon: [],
             sightings: [],
-            data: []
+            data: [],
+            refreshing: false,
         }
     }
 
@@ -188,7 +189,37 @@ class LocationSight extends Component {
             
     }
 
-    getLoction = async () => {
+    getCurrLoctionTimeSpecies = async () => {
+
+
+        function prepareGrid(grid){
+
+            let polygon = [];
+            let loc1 = {}
+            loc1.longitude = parseFloat(grid.x_coordinate_start);
+            loc1.latitude = parseFloat(grid.y_coordinate_start);
+    
+            let loc2 = {}
+            loc2.longitude = parseFloat(grid.x_coordinate_start);
+            loc2.latitude = parseFloat(grid.y_coordinate_end);
+    
+            let loc3 = {}
+            loc3.longitude = parseFloat(grid.x_coordinate_end);
+            loc3.latitude = parseFloat(grid.y_coordinate_start);
+    
+            let loc4 = {}
+            loc4.longitude = parseFloat(grid.x_coordinate_end);
+            loc4.latitude = parseFloat(grid.y_coordinate_end);
+    
+            polygon.push(loc1);
+            polygon.push(loc2);
+            polygon.push(loc4);
+            polygon.push(loc3);
+            polygon.push(loc1);
+
+            
+            return polygon;
+        }
 
             this.setState({
                 type: "Current"
@@ -216,14 +247,44 @@ class LocationSight extends Component {
             this.setState({
                 latitude: loc.coords.latitude,
                 longitude: loc.coords.longitude
-            })
+            });
+
+            ToastAndroid.show("Preparing Grid....", ToastAndroid.SHORT);
+
+            await this.props.getCustomGrid(this.state.latitude.toString(), this.state.longitude.toString());
+            
+            let grid = this.props.grids.grids[0];
+
+            if(!grid)
+            {
+                Alert.alert('Unprocessed Location', 'Your current Location is not covered by WildSight Grid system! \nRefresh screen to enter custom location using Map.');
+                return;
+            }    
+
+            var polygon = prepareGrid(grid);
+            this.setState({
+                polygon: polygon
+            });
+
+            setTimeout(() => this.setState({
+                sheetVisible: false
+            }), 2000);
+
+            await this.props.getCustomSightings(grid.id, this.state.month);
+
+            this.setState({
+                sightings: this.props.sightings.sightings
+            });
+
+            this.getData(this.state.sightings);
+
     }
 
     componentDidMount(){
 
         Alert.alert(
             "Location",
-            "Choose Location Type",
+            "Choose Location Type to enter locaion or else any random will be chosen",
             [
               { 
                   text: "Custom", 
@@ -231,10 +292,45 @@ class LocationSight extends Component {
               },
               {
                 text: "Current",
-                onPress: () => this.getLoction()
+                onPress: () => this.getCurrLoctionTimeSpecies()
               }
             ]
           );
+    }
+
+    onRefresh = () => {
+        this.setState({
+            refreshing: true,
+            month: d.getMonth()+1,
+            sheetVisible: false,
+            errorMsg: null,
+            latitude: 30.73629,
+            longitude:  76.7884,
+            location: null,
+            type: "Current",
+            polygon: [],
+            sightings: [],
+            data: [],
+        });
+
+        Alert.alert(
+            "Location",
+            "Choose Location Type to enter locaion or else any random will be chosen",
+            [
+              { 
+                  text: "Custom", 
+                  onPress: () => this.onCustomSelect()
+              },
+              {
+                text: "Current",
+                onPress: () => this.getCurrLoctionTimeSpecies()
+              }
+            ]
+          );
+
+        this.setState({
+            refreshing: false
+        })
     }
 
     render() {
@@ -276,22 +372,9 @@ class LocationSight extends Component {
 
         let screenHeight = 2*Dimensions.get('window').height;
 
-        const inChandigarh = () => {
-
-            let lat = this.state.latitude;
-            let lng = this.state.longitude;
-
-            if(lat <= 30.819310 && lat > 30.632511 && lng <= 76.923046 && lat > 76.634918)
-                return true;
-            else
-                return false;
-        }
-
-
-        if ((this.state.location || this.state.type === "Custom")){
+        
+        if ((this.state.location || this.state.type === "Custom" || this.state.type === "Current")){
             
-                // if((this.state.location || this.state.type === "Custom") || inChandigarh()){
-
                     var list;
                     if(this.props.sightings.isLoading || this.props.species.isLoading){
 
@@ -300,6 +383,10 @@ class LocationSight extends Component {
                     else {
                         if(this.props.sightings.sightings.length === 0){
                             list = <Text style={styles.noRecord}>No Species Recorded for given location and month.</Text>
+                        }
+                        else if(this.props.sightings.errMess || this.props.species.errMess)
+                        {
+                            list = <Text style={styles.noRecord}>Error:- {this.props.sightings.errMess || this.props.species.errMess}</Text>
                         }
                         else {
                             list = <FlatList
@@ -314,6 +401,18 @@ class LocationSight extends Component {
 
                 return (
                     <View style={styles.container}>
+                         <View style={{height: '5%', zIndex: 1}}>
+                            <ScrollView
+                                contentContainerStyle={styles.scrollView}
+                                refreshControl={
+                                    <RefreshControl 
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={() => this.onRefresh()}
+                                    />
+                                }
+                            >
+                            </ScrollView>
+                        </View>
                         <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                         <SafeAreaView style={{flex: 1}}>
                             <BottomSheet isVisible={this.state.sheetVisible} >
@@ -409,16 +508,6 @@ class LocationSight extends Component {
                         </ImageBackground>
                     </View>
             );
-        // }
-            /*else{
-                return (
-                    <View style={styles.container}>
-                        <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
-                            <Text style={styles.noRecord}>You are not in Chandigarh</Text>
-                        </ImageBackground>
-                    </View>
-                );
-            }*/
         }
         else
         {   
@@ -457,7 +546,11 @@ const styles = StyleSheet.create({
         textAlign: "center",
         backgroundColor: "#000000a0",
         textAlignVertical: 'center'
-      }
+      },
+      scrollView: {
+        flex: 1,
+        //backgroundColor: '#00000099'
+      },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LocationSight); 
