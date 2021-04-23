@@ -35,7 +35,7 @@ const config = {
             UserProfile,
             UserSightings
         }),
-        applyMiddleware(thunk)
+        applyMiddleware(thunk, logger)
     );
 
     const persistor = persistStore(store);

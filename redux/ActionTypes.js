@@ -30,7 +30,6 @@ export const VOTING= "VOTING"
 
 export const REGISTER_USER = "REGISTER_USER"
 export const LOGIN_USER = "LOGIN_USER"
-export const UPDATE_USER = "UPDATE_USER"
 export const LOGOUT_USER = "LOGOUT_USER"
 export const AUTH_FAILED = "AUTH_FAILED"
 
@@ -39,5 +38,7 @@ export const GET_USER_FAILED = "GET_USER_FAILED"
 export const USER_LOADING  = "USER_LOADING"
 export const GET_USER_SIGHTINGS = "GET_USER_SIGHTINGS"
 export const USER_SIGHTINGS_FAILED = "GET_USER_SIGHTINGS_FAILED"
+export const UPDATE_USER = "UPDATE_USER"
+export const UPDATE_USER_FAILED = "UPDATE_USER_FAILED"
 
 
