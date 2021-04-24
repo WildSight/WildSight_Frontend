@@ -7,7 +7,9 @@ import MapView, {Marker} from 'react-native-maps';
 import {openSettingApp, getImageFromGallery, getImageFromCamera, getUserLoction} from './commonComponents/permissions';
 import { connect } from "react-redux";
 import {fetchSpecies, searchSpecie} from '../redux/actions/specie';
+import {getCustomGrid} from '../redux/actions/grid';
 import {postRawSighting} from '../redux/actions/rawsighting';
+import {getCustomSpeciesLocationSightings} from '../redux/actions/sighting';
 import {Loading} from './LoadingComponent';
 import { SafeAreaView } from 'react-native';
 import {DatePicker} from 'native-base';
@@ -21,6 +23,8 @@ let screenHeight = 2*Dimensions.get('window').height;
 const  mapStateToProps = (state) => {
     return{
         species: state.species,
+        grids: state.grids,
+        sightings: state.sightings,
         rawsightings: state.rawsightings,
         Auth: state.Auth
     };
@@ -31,7 +35,9 @@ const mapDispatchToProps = dispatch => {
     return {
         fetchSpecies: () => dispatch(fetchSpecies()),
         searchSpecie: (birdFilter) => dispatch(searchSpecie(birdFilter)),
-        postRawSighting: (rawSighting, token) => dispatch(postRawSighting(rawSighting, token))
+        getCustomGrid: (lat, long) => dispatch(getCustomGrid(lat, long)),
+        postRawSighting: (rawSighting, token) => dispatch(postRawSighting(rawSighting, token)),
+        getCustomSpeciesLocationSightings: (gridId, time, specieId) => dispatch(getCustomSpeciesLocationSightings(gridId, time, specieId))
     };
 }
 
@@ -51,9 +57,6 @@ class AddSighting extends Component {
             blob: null,
             showDatePicker: false,
             date: new Date(),
-            //time: new Date(),
-            //show: false,
-            //mode: "date",
             dateTime: '',
             errorMsg: null,
             latitude: 30.73629,
@@ -103,11 +106,36 @@ class AddSighting extends Component {
 
     }
 
-    handleSubmit = () => {
+    handleSubmit = async () => {
 
         if(this.formValidation())
         {
+
+            await this.props.getCustomGrid(this.state.latitude.toString(), this.state.longitude.toString());
+            
+            let grid = this.props.grids.grids[0];
+            
+            await this.props.getCustomSpeciesLocationSightings(grid.id, Moment(this.state.date).format('M'), this.state.birdId);
+
+            var sightings = this.props.sightings.sightings[0];
+
             var rawSighting = {};
+
+            var credibilityError = 1;
+            if(!sightings){
+                rawSighting.credible = false;
+            }
+            else{
+
+                var averageSightings = parseFloat(sightings.Count)/parseFloat(sightings.Number_of_sightings);
+                credibilityError = Math.abs(averageSightings-parseFloat(this.state.birdCount))/averageSightings;
+
+                if(credibilityError <= 0.3){
+                    rawSighting.credible = true;
+                }   
+                else
+                    rawSighting.credible = false; 
+            }       
 
             rawSighting.image = this.state.imageUrl
             rawSighting.user = this.props.Auth.username.toString();
@@ -117,11 +145,9 @@ class AddSighting extends Component {
             rawSighting.location_longitude = parseFloat(this.state.longitude.toFixed(6));
             rawSighting.location_latitude = parseFloat(this.state.latitude.toFixed(6));
 
-            this.props.postRawSighting(rawSighting, this.props.Auth.token);
+            await this.props.postRawSighting(rawSighting, this.props.Auth.token);
         }
-        else{
-            Alert.alert(null, this.state.imageUrl);
-        }
+    
     }
 
     dateSelect(Date){

@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import { FlatList, View, Image, ImageBackground, Text, StyleSheet} from 'react-native';
+import { FlatList, View, Image, ImageBackground, Text, StyleSheet, ScrollView} from 'react-native';
 import { ListItem, Icon, BottomSheet, Button, Card, Avatar} from 'react-native-elements';
 import {getUserProfile, fetchUserSightings} from '../redux/actions/user'
 
 import {fetchBird} from '../redux/actions/bird';
+import { SafeAreaView } from 'react-native';
+//import { ScrollView } from 'react-native-gesture-handler';
 class Profile extends Component {
     constructor(props){
         super(props);
@@ -39,7 +41,7 @@ class Profile extends Component {
                 containerStyle={{
                     backgroundColor: "#51adcf",
                     height: 100, borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
-                    marginTop: '3%'}}
+                    marginTop: '3%', marginBottom: '2%'}}
                 pad = {30}
             >   
                 {(item.image&&<Avatar rounded size={'large'} source={{uri: item.image}} icon={{name: 'user', type: 'font-awesome'}}/>)||
@@ -90,8 +92,8 @@ class Profile extends Component {
         if(this.props.UserProfile.data){
             const user = this.props.UserProfile.data;
         return (
-            <View style={styles.container}>
-                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
+            <ScrollView style={styles.container}>
+                {/* <ImageBackground source={require('./images/wild2.png')} style={styles.image}> */}
                 <View style={{height:'100%', backgroundColor: "#000000aa"}}>
                 <View>
                 <Card key={1}
@@ -102,7 +104,7 @@ class Profile extends Component {
                     <View style={{marginBottom: 10,marginLeft:'auto', marginRight:'auto' }}>
                         <Avatar containerStyle={{justifyContent:'center', borderColor:'#000', borderWidth:2}}  rounded size={'xlarge'} source={require("./images/user.png")} />
                     </View>
-                    <Card.Title style={{fontSize:34, textAlign:'left'}}>
+                    <Card.Title style={{fontSize:26, textAlign:'left'}}>
                     <Icon type = 'font-awesome-5' name='at' iconStyle={{marginRight: 10}}/>
                     {user.username}
                     </Card.Title>
@@ -129,15 +131,15 @@ class Profile extends Component {
                         title='Update profile' />
                     </View>
                 </Card>
-                {this.state.userSightings && this.getSightingsList()}
+                    {this.state.userSightings && this.getSightingsList()}
                 <View>
                     
                 </View>
                 </View>
                 
                 </View>
-                </ImageBackground>
-            </View>
+                {/* </ImageBackground> */}
+            </ScrollView>
         );
         }
         return(

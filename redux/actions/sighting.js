@@ -28,6 +28,32 @@ export const getCustomSightings = (gridId, time) => (dispatch) => {
 		.catch((error) => dispatch(sightingsFailed(error.message)));
 }
 
+export const getCustomSpeciesLocationSightings = (gridId, time, specieId) => (dispatch) => {
+
+	dispatch(sightingsLoading(true));
+	return fetch(baseUrl + `Refined_Sightings/Species-Location/?loc=${gridId}&time=${time}&sp=${specieId}`)
+		.then(
+			(response) => {
+				if (response.ok) {
+					return response;
+				} else {
+					var error = new Error(
+						"Error " + response.status + ": " + response.statusText
+					);
+					error.response = response;
+					throw error;
+				}
+			},
+			(error) => {
+				var errmess = new Error(error.message);
+				throw errmess;
+			}
+		)
+		.then((response) => response.json())
+		.then((sightings) => dispatch(addSightings(sightings)))
+		.catch((error) => dispatch(sightingsFailed(error.message)));
+}
+
 export const getCustomSpecieSightings = (specieId, timeId) => (dispatch) => {
 
 	dispatch(sightingsLoading(true));
