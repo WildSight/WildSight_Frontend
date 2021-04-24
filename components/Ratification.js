@@ -14,8 +14,8 @@ class Ratification extends Component {
   constructor(props){
     super(props);
     this.state = {
-        limit:10,
-        skip:0,
+        limit:1,
+        skip:-1,
         sheetVisible: false,
         latitude: 30.73629,
         longitude:  76.7884,
@@ -24,17 +24,36 @@ class Ratification extends Component {
 }
   componentDidMount= async()=>{
     const authToken=this.props.auth.token
-    const reqUser = this.props.auth.id;
-    await this.props.getUnratifiedSights({token:authToken, limit:this.state.limit, skip:this.state.skip})
-    let data = this.props.UnratifiedSightings.data;
-    if(data){
-      for(var i=0;i<data.length;i++){
-          await this.props.fetchBird(data[i].species);
-          data[i] = {...data[i], name: this.props.birds.birds.common_name}
-        }
-    }
-    this.setState({data})
+    this.retrieveData();
+    // await this.props.getUnratifiedSights({token:authToken, limit:this.state.limit, skip:this.state.skip})
+    // let data = this.props.UnratifiedSightings.data;
+    // if(data){
+    //   for(var i=0;i<data.length;i++){
+    //       await this.props.fetchBird(data[i].species);
+    //       data[i] = {...data[i], name: this.props.birds.birds.common_name}
+    //     }
+    // }
+    // this.setState({data})
   }
+
+  retrieveData = async()=>{
+    const authToken=this.props.auth.token
+    await this.props.getUnratifiedSights({token:authToken, limit:this.state.limit, skip:this.state.skip+1})
+    let newData = this.props.UnratifiedSightings.data;
+    if(newData){
+      for(var i=0;i<newData.length;i++){
+          await this.props.fetchBird(newData[i].species);
+          newData[i] = {...newData[i], name: this.props.birds.birds.common_name}
+        }
+        var prevData = this.state.data, skip = this.state.skip;
+        const resData = prevData.concat(newData)
+        this.setState({
+          data: resData,
+          skip:skip+1
+        })
+    }
+  }
+
 
 
   upvoteSighting = async(sightingId)=>{
@@ -168,6 +187,8 @@ class Ratification extends Component {
                         return item.id.toString()}
                         }
                         style={{marginBottom: 30}}
+                        onEndReached={this.retrieveData}
+                        onEndReachedThreshold={0}
                         /> 
                         <BottomSheet isVisible={this.state.sheetVisible} >
                                 <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -210,7 +231,13 @@ class Ratification extends Component {
       }else{
         return(
           <>
-            <Text>Trying to fetch. Hope I get something</Text>
+            <View style={styles.container}>
+                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
+                      <View style={{height:'100%', backgroundColor: "#000000aa"}}>
+                        <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Trying to fetch...</Text>
+                      </View>
+                </ImageBackground>
+            </View>
           </>
         )
       }

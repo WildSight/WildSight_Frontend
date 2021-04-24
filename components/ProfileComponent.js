@@ -142,7 +142,13 @@ class Profile extends Component {
         }
         return(
             <>
-                <Text>Loading profile</Text>
+                <View style={styles.container}>
+                    <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
+                        <View style={{height:'100%', backgroundColor: "#000000aa"}}>
+                            <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Trying to fetch...</Text>
+                        </View>
+                    </ImageBackground>
+                </View>
             </>
         )
     }
