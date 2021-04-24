@@ -24,12 +24,15 @@ class Ratification extends Component {
 }
   componentDidMount= async()=>{
     const authToken=this.props.auth.token
+    const reqUser = this.props.auth.id;
     await this.props.getUnratifiedSights({token:authToken, limit:this.state.limit, skip:this.state.skip})
     let data = this.props.UnratifiedSightings.data;
-    for(var i=0;i<data.length;i++){
-        await this.props.fetchBird(data[i].species);
-        data[i] = {...data[i], name: this.props.birds.birds.common_name}
-      }
+    if(data){
+      for(var i=0;i<data.length;i++){
+          await this.props.fetchBird(data[i].species);
+          data[i] = {...data[i], name: this.props.birds.birds.common_name}
+        }
+    }
     this.setState({data})
   }
 
@@ -207,7 +210,7 @@ class Ratification extends Component {
       }else{
         return(
           <>
-            <Text>Trying to fetch</Text>
+            <Text>Trying to fetch. Hope I get something</Text>
           </>
         )
       }
