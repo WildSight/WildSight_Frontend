@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import { View, Image, ImageBackground, Text, StyleSheet, FlatList, Dimensions} from 'react-native';
+import {ActivityIndicator, View, Image, ImageBackground, Text, StyleSheet, FlatList, Dimensions} from 'react-native';
 import {ListItem, Icon, BottomSheet, Button, Card, Avatar} from 'react-native-elements';
 import CardTemplate from './commonComponents/lists';
 import MapView, {Marker} from 'react-native-maps';
@@ -14,12 +14,14 @@ class Ratification extends Component {
   constructor(props){
     super(props);
     this.state = {
-        limit:10,
+        limit:5,
         skip:-1,
         sheetVisible: false,
         latitude: 30.73629,
         longitude:  76.7884,
-        data:[]
+        data:[],
+        refreshing: false,
+        isCompleted: false
     }
 }
   componentDidMount= async()=>{
@@ -37,26 +39,46 @@ class Ratification extends Component {
   }
 
   retrieveData = async()=>{
+    if (this.state.refreshing||this.state.isCompleted){
+      return null;
+    }
     const authToken=this.props.auth.token
-    await this.props.getUnratifiedSights({token:authToken, limit:this.state.limit, skip:this.state.skip+1})
-    let newData = this.props.UnratifiedSightings.data;
-    if(newData){
-      for(var i=0;i<newData.length;i++){
-          let common_name;
-          if(newData[i].species){
-            await this.props.fetchBird(newData[i].species);
-            common_name = this.props.birds.birds.common_name;
-          }else{
-            common_name = newData[i].new_species;
-          }
-          newData[i] = {...newData[i], name: common_name}
+    this.setState({
+      refreshing:true
+    })
+    try{
+      await this.props.getUnratifiedSights({token:authToken, limit:this.state.limit, skip:this.state.skip+1})
+      let newData = this.props.UnratifiedSightings.data;
+      if(newData){
+        if(newData.length==0){
+          this.setState({
+            refreshing:false,
+            isCompleted:true
+          })
+          return null;
         }
-        var prevData = this.state.data, skip = this.state.skip;
-        const resData = prevData.concat(newData)
-        this.setState({
-          data: resData,
-          skip:skip+1
-        })
+        for(var i=0;i<newData.length;i++){
+            let common_name;
+            if(newData[i].species){
+              await this.props.fetchBird(newData[i].species);
+              common_name = this.props.birds.birds.common_name;
+            }else{
+              common_name = newData[i].new_species;
+            }
+            newData[i] = {...newData[i], name: common_name}
+          }
+          var prevData = this.state.data, skip = this.state.skip;
+          const resData = prevData.concat(newData)
+          this.setState({
+            data: resData,
+            skip:this.state.skip+1,
+            refreshing:false
+          })
+      }
+    }catch(e){
+      this.setState({
+        refreshing:false
+      })
     }
   }
 
@@ -116,7 +138,6 @@ class Ratification extends Component {
     const color = '#ffa500'
         const {item, index} = props;
         const userId=this.props.auth.userId;
-        // console.log({item, index})
         if(item.voted_by.includes(userId))
           return (<></>)
         return (
@@ -177,6 +198,13 @@ class Ratification extends Component {
             </Card>            
         )
   }
+  renderFooter=()=>{
+    if (this.state.refreshing) {
+      return <ActivityIndicator size="large" animating={true} color="#d52412" />;
+    } else {
+      return null;
+    }
+  }
 
     render() {
 
@@ -194,6 +222,8 @@ class Ratification extends Component {
                         return item.id.toString()}
                         }
                         style={{marginBottom: 30}}
+                        ListFooterComponent={this.renderFooter}
+                        refreshing={this.state.refreshing}
                         onEndReached={this.retrieveData}
                         onEndReachedThreshold={0}
                         /> 
@@ -241,7 +271,8 @@ class Ratification extends Component {
             <View style={styles.container}>
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                       <View style={{height:'100%', backgroundColor: "#000000aa"}}>
-                        <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Trying to fetch sightings...</Text>
+                        <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Fetching sightings<ActivityIndicator size="large" animating={true} color="#125112"/></Text>
+                        {/* <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Trying to fetch sightings...</Text> */}
                       </View>
                 </ImageBackground>
             </View>
