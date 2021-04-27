@@ -11,7 +11,12 @@ class Profile extends Component {
     constructor(props){
         super(props);
         this.state = {
-            userSightings:[]
+            limit:10,
+            skip:-1,
+            userSightings:[],
+            sheetVisible: false,
+            latitude: 30.73629,
+            longitude:  76.7884,
         }
     }
 
@@ -24,8 +29,15 @@ class Profile extends Component {
         for(var i=0;i<userSightings.length;i++){
           let temporary_id=i;
           let sighting = userSightings[i];
-          await this.props.fetchBird(userSightings[i].species);
-          let obj = {...sighting, temporary_id, common_name:this.props.birds.birds.common_name}
+          let common_name;
+          if(userSightings[i].species){
+            await this.props.fetchBird(userSightings[i].species);
+            common_name = this.props.birds.birds.common_name;
+          }else{
+            common_name = userSightings[i].new_species;
+          }
+          
+          let obj = {...sighting, temporary_id, common_name}
           data.push(obj);
         }
         this.setState({
@@ -40,7 +52,7 @@ class Profile extends Component {
                 key={index}
                 containerStyle={{
                     backgroundColor: "#51adcf",
-                    height: 100, borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
+                    height: "auto", borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
                     marginTop: '3%', marginBottom: '2%'}}
                 pad = {30}
             >   
@@ -48,20 +60,36 @@ class Profile extends Component {
                  (<Avatar rounded size={'large'} source={require("./images/Logo.png")} icon={{name: 'user', type: 'font-awesome'}}/>)
                 }
                 <ListItem.Content>
-                    <ListItem.Title style={{fontWeight: 'bold', color: '#fff'}}>
+                    <ListItem.Title style={{fontWeight: 'bold', color: '#fff', marginBottom:5}}>
                         <Icon name='feather'
                                     type="font-awesome-5" 
                                     color='white'
                                     size={15}
                                     iconStyle={{marginRight: 10}} />{item.common_name}
                     </ListItem.Title>
-                    <ListItem.Subtitle style={{fontWeight: 'bold', color: '#fff'}}>
+                    <ListItem.Subtitle style={{fontWeight: 'bold', color: '#fff', marginBottom:5}}>
                         <Icon name='eye'
                             type="font-awesome-5" 
                             color='white'
                             size={15}
                             iconStyle={{marginRight: 10}} />{item.count}
                     </ListItem.Subtitle>
+                    
+                    <ListItem.Subtitle onPress={() => this.setState({
+                      sheetVisible: !this.state.sheetVisible,
+                      latitude: parseFloat(item.location_latitude),
+                      longitude: parseFloat(item.location_longitude)
+                    })} style={{ fontWeight: 'bold', color: '#fff', marginBottom:5}}>
+                        <Icon name='map-marker-alt' type="font-awesome-5"  color='#4b778d' size={15}
+                            iconStyle={{marginRight: 10}} />{item.location_latitude +", "+ item.location_longitude}
+                    </ListItem.Subtitle>
+                    
+                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#eee', marginBottom:5}}>
+                        <Icon name='calendar-alt' type="font-awesome-5"  color='#eee' size={15}
+                            iconStyle={{marginRight: 10}} />
+                            {new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'long', year: 'numeric', hour:'numeric', minute:'numeric'}).format(new Date(Date.parse(item.date_time)))}
+                    </ListItem.Subtitle>
+                    
                 </ListItem.Content>
             </ListItem>
         );
@@ -70,7 +98,7 @@ class Profile extends Component {
 
     getSightingsList = ()=>{
         let userSightings =  this.state.userSightings;
-        if(userSightings){
+        if(userSightings.length>0){
             return(
                 <FlatList
                     data={this.state.userSightings}
@@ -82,19 +110,24 @@ class Profile extends Component {
                         />
 
             )
-        }
-        
+        }else{
+            return(
 
-
+                <View style={{marginTop: 20,marginLeft:'auto', marginRight:'auto' }}>
+                    <Text style={{fontSize:20}}>You have not posted any sightings yet....</Text>
+                </View>
+            )
+        } 
     }
 
     render() {
         if(this.props.UserProfile.data){
             const user = this.props.UserProfile.data;
         return (
-            <ScrollView style={styles.container}>
-                {/* <ImageBackground source={require('./images/wild2.png')} style={styles.image}> */}
+            <View style={styles.container}>
+                <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                 <View style={{height:'100%', backgroundColor: "#000000aa"}}>
+                <ScrollView >
                 <View>
                 <Card key={1}
                     containerStyle={{
@@ -131,18 +164,17 @@ class Profile extends Component {
                         title='Update profile' />
                     </View>
                 </Card>
-                    {this.state.userSightings && this.getSightingsList()}
+                    {this.getSightingsList()}
                 <View>
                     
                 </View>
                 </View>
-                
+                </ScrollView>
                 </View>
-                {/* </ImageBackground> */}
-            </ScrollView>
+                </ImageBackground>
+            </View>
         );
-        }
-        return(
+        }else return(
             <>
                 <View style={styles.container}>
                     <ImageBackground source={require('./images/wild2.png')} style={styles.image}>

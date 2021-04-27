@@ -14,7 +14,7 @@ class Ratification extends Component {
   constructor(props){
     super(props);
     this.state = {
-        limit:1,
+        limit:10,
         skip:-1,
         sheetVisible: false,
         latitude: 30.73629,
@@ -42,8 +42,14 @@ class Ratification extends Component {
     let newData = this.props.UnratifiedSightings.data;
     if(newData){
       for(var i=0;i<newData.length;i++){
-          await this.props.fetchBird(newData[i].species);
-          newData[i] = {...newData[i], name: this.props.birds.birds.common_name}
+          let common_name;
+          if(newData[i].species){
+            await this.props.fetchBird(newData[i].species);
+            common_name = this.props.birds.birds.common_name;
+          }else{
+            common_name = newData[i].new_species;
+          }
+          newData[i] = {...newData[i], name: common_name}
         }
         var prevData = this.state.data, skip = this.state.skip;
         const resData = prevData.concat(newData)
@@ -110,6 +116,7 @@ class Ratification extends Component {
     const color = '#ffa500'
         const {item, index} = props;
         const userId=this.props.auth.userId;
+        // console.log({item, index})
         if(item.voted_by.includes(userId))
           return (<></>)
         return (
@@ -175,7 +182,7 @@ class Ratification extends Component {
 
       let screenHeight = 2*Dimensions.get('window').height;
 
-      if(this.state.data){
+      if(this.state.data.length>0){
         return (
             <View style={styles.container}>
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
@@ -234,7 +241,7 @@ class Ratification extends Component {
             <View style={styles.container}>
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                       <View style={{height:'100%', backgroundColor: "#000000aa"}}>
-                        <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Trying to fetch...</Text>
+                        <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Trying to fetch sightings...</Text>
                       </View>
                 </ImageBackground>
             </View>
