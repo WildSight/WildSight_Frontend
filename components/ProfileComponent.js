@@ -143,17 +143,21 @@ class Profile extends Component {
                     </Card.Title>
                         
                     <View style={{marginBottom: 10}}>
-                        <Text>{user.first_name?<ListItem.Subtitle style={{fontWeight: 'bold', color: '#fff'}}>
-                            <Icon name='user' type="font-awesome-5" color='white' size={18}
-                                iconStyle={{marginRight: 10, transform: [{ translateY: 3}]}} />
+                        <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#fff', marginBottom:10}}>
+                                    <Text><Icon name='envelope' type="font-awesome-5"  color='white' size={18}
+                                        iconStyle={{marginRight: 10, transform: [{ translateY: 3}]}} /></Text>
+                                    <Text style={{fontSize:18, transform: [{ translateY: -1}]}}>{user.email}</Text>
+                                </ListItem.Subtitle>
+                        <Text>{user.first_name&&
+                        <ListItem.Subtitle style={{fontWeight: 'bold', color: '#fff', marginBottom:10}}>
+                            <Text><Icon name='user' type="font-awesome-5" color='white' size={18}
+                                iconStyle={{marginRight: 10, transform: [{ translateY: 3}]}} /></Text>
                             <Text style={{fontSize:18, transform: [{ translateY: -1}]}}>{user.first_name+" "+user.last_name}</Text>
-                        </ListItem.Subtitle>:''
-                        }</Text>
-                        <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#fff'}}>
-                            <Icon name='envelope' type="font-awesome-5"  color='white' size={18}
-                                iconStyle={{marginRight: 10, transform: [{ translateY: 3}]}} />
-                            <Text style={{fontSize:18, transform: [{ translateY: -1}]}}>{user.email}</Text>
                         </ListItem.Subtitle>
+                        }</Text>
+                        
+                                
+                        
                     </View>
 
                     <View style={{ justifyContent:'space-between'}}>

@@ -14,7 +14,7 @@ class Ratification extends Component {
   constructor(props){
     super(props);
     this.state = {
-        limit:5,
+        limit:10,
         skip:-1,
         sheetVisible: false,
         latitude: 30.73629,
@@ -27,15 +27,6 @@ class Ratification extends Component {
   componentDidMount= async()=>{
     const authToken=this.props.auth.token
     this.retrieveData();
-    // await this.props.getUnratifiedSights({token:authToken, limit:this.state.limit, skip:this.state.skip})
-    // let data = this.props.UnratifiedSightings.data;
-    // if(data){
-    //   for(var i=0;i<data.length;i++){
-    //       await this.props.fetchBird(data[i].species);
-    //       data[i] = {...data[i], name: this.props.birds.birds.common_name}
-    //     }
-    // }
-    // this.setState({data})
   }
 
   retrieveData = async()=>{
@@ -200,7 +191,7 @@ class Ratification extends Component {
   }
   renderFooter=()=>{
     if (this.state.refreshing) {
-      return <ActivityIndicator size="large" animating={true} color="#d52412" />;
+      return <ActivityIndicator size="large" animating={true} color="#125112" />;
     } else {
       return null;
     }
@@ -271,8 +262,7 @@ class Ratification extends Component {
             <View style={styles.container}>
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                       <View style={{height:'100%', backgroundColor: "#000000aa"}}>
-                        <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Fetching sightings<ActivityIndicator size="large" animating={true} color="#125112"/></Text>
-                        {/* <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Trying to fetch sightings...</Text> */}
+                        <Text style={{marginTop:'50%', fontSize:35, textAlign:'center'}}>Fetching sightings<ActivityIndicator size="large" animating={true} color="#125112"/></Text>
                       </View>
                 </ImageBackground>
             </View>
