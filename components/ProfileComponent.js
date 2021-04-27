@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import { FlatList, View, Image, ImageBackground, Text, StyleSheet, ScrollView} from 'react-native';
+import {ActivityIndicator, FlatList, View, Image, ImageBackground, Text, StyleSheet, ScrollView} from 'react-native';
 import { ListItem, Icon, BottomSheet, Button, Card, Avatar} from 'react-native-elements';
 import {getUserProfile, fetchUserSightings} from '../redux/actions/user'
 
@@ -17,32 +17,68 @@ class Profile extends Component {
             sheetVisible: false,
             latitude: 30.73629,
             longitude:  76.7884,
+            refreshing: false,
+            isCompleted: false
         }
     }
 
-    componentDidMount = async()=>{
+    componentDidMount =async()=>{
         const authToken = this.props.auth.token;
         await this.props.getUserProfile({token:authToken});
-        await this.props.fetchUserSightings({token:authToken})
-        let userSightings = this.props.UserSightings.data;
-        let data = []
-        for(var i=0;i<userSightings.length;i++){
-          let temporary_id=i;
-          let sighting = userSightings[i];
-          let common_name;
-          if(userSightings[i].species){
-            await this.props.fetchBird(userSightings[i].species);
-            common_name = this.props.birds.birds.common_name;
-          }else{
-            common_name = userSightings[i].new_species;
-          }
-          
-          let obj = {...sighting, temporary_id, common_name}
-          data.push(obj);
+        this.retrieveData();
+    }
+
+    retrieveData= async()=>{
+        if (this.state.refreshing||this.state.isCompleted){
+            return null;
         }
+        const authToken = this.props.auth.token;
         this.setState({
-            userSightings:data
+            refreshing:true
         })
+        try{
+            await this.props.fetchUserSightings({token:authToken})
+            let userSightings = this.props.UserSightings.data;
+            if(userSightings.length==0){
+                this.setState({
+                    refreshing:false,
+                    isCompleted:true
+                })
+                return null;
+            }
+            let data = []
+            for(var i=0;i<userSightings.length;i++){
+            let temporary_id=i;
+            let sighting = userSightings[i];
+            let common_name;
+            if(userSightings[i].species){
+                await this.props.fetchBird(userSightings[i].species);
+                common_name = this.props.birds.birds.common_name;
+            }else{
+                common_name = userSightings[i].new_species;
+            }
+            
+            let obj = {...sighting, temporary_id, common_name}
+            data.push(obj);
+            }
+            var prevData = this.state.userSightings;
+            console.log(prevData);
+            console.log("data", data)
+            const resData = prevData.concat(data)
+            console.log("resutant", resData)
+            this.setState({
+                userSightings:resData,
+                skip:this.state.skip+1,
+                refreshing:false
+            })
+
+        }catch(e){
+            console.log(e);
+            this.setState({
+                refreshing:false
+              })
+        }
+
     }
     renderListTempelate = (props)=>{
         const {item, index} = props;
@@ -95,6 +131,13 @@ class Profile extends Component {
         );
 
     }
+    renderFooter=()=>{
+        if (this.state.refreshing) {
+          return <ActivityIndicator size="large" animating={true} color="#125112" />;
+        } else {
+          return null;
+        }
+    }
 
     getSightingsList = ()=>{
         let userSightings =  this.state.userSightings;
@@ -102,22 +145,24 @@ class Profile extends Component {
             return(
                 <FlatList
                     data={this.state.userSightings}
-                        renderItem={this.renderListTempelate}
-                        keyExtractor={item =>{
+                    renderItem={this.renderListTempelate}
+                    keyExtractor={item =>{
                         return item.temporary_id.toString()}
-                        }
-                        style={{marginBottom: 30}}
-                        />
+                    }
+                    style={{marginBottom: 30}}
+                    ListFooterComponent={this.renderFooter}
+                    refreshing={this.state.refreshing}
+                    onEndReached={this.retrieveData}
+                    onEndReachedThreshold={0}
+                />
 
             )
-        }else{
-            return(
-
-                <View style={{marginTop: 20,marginLeft:'auto', marginRight:'auto' }}>
-                    <Text style={{fontSize:20}}>You have not posted any sightings yet....</Text>
-                </View>
-            )
-        } 
+        }
+        return(
+            <Text style={{marginTop:'10%', fontSize:30, textAlign:'center'}}>Loading User Sightings <ActivityIndicator 
+                size='large' animating={true} color="#125112"/>
+            </Text>
+        )
     }
 
     render() {
@@ -183,7 +228,9 @@ class Profile extends Component {
                 <View style={styles.container}>
                     <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                         <View style={{height:'100%', backgroundColor: "#000000aa"}}>
-                            <Text style={{marginTop:'50%', fontSize:40, textAlign:'center'}}>Trying to fetch...</Text>
+                            <Text style={{marginTop:'50%', fontSize:30, textAlign:'center'}}>Loading <ActivityIndicator 
+                                size='large' animating={true} color="#125112"/>
+                            </Text>
                         </View>
                     </ImageBackground>
                 </View>

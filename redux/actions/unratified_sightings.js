@@ -5,8 +5,6 @@ import { record, authRecord } from "../../shared/baseUrl";
 export const getUnratifiedSights = (details) => async (dispatch,getState) =>{
 	const {token,limit, skip }= details;
     const num = limit;
-    console.log(token, num, limit, skip);
-
     try{
         const res = await authRecord(token).get('/Ratification_List', {params:{num, skip}});
         dispatch({type:ActionTypes.GET_UNRATIFIED_SIGHTING, payload:{data:res.data}});
