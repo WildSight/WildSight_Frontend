@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import { View, ScrollView, Text, Alert, Dimensions, TouchableOpacity, ToastAndroid, FlatList, SectionList} from 'react-native';
 import { Button, Image, Input, Icon, BottomSheet, ListItem} from 'react-native-elements';
-//import DateTimePicker from "@react-native-community/datetimepicker";
 import Moment from 'moment';
 import MapView, {Marker} from 'react-native-maps';
 import {openSettingApp, getImageFromGallery, getImageFromCamera, getUserLoction} from './commonComponents/permissions';
@@ -122,7 +121,7 @@ class AddSighting extends Component {
             var rawSighting = {};
 
             var credibilityError = 1;
-            if(!sightings){
+            if(!sightings || this.state.imageUrl !== 'abc.png'){
                 rawSighting.credible = false;
             }
             else{
@@ -135,7 +134,10 @@ class AddSighting extends Component {
                 }   
                 else
                     rawSighting.credible = false; 
-            }       
+            } 
+            
+            var credibilityScore = 100*(1-credibilityError);
+            ToastAndroid.show("Current Credibilty Score of sighting: "+credibilityScore.toString()+"%", ToastAndroid.LONG);
 
             rawSighting.image = this.state.imageUrl
             rawSighting.user = this.props.Auth.username.toString();
