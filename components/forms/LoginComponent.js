@@ -70,7 +70,7 @@ class Login extends Component {
                         <View style={{marginHorizontal: '5%', marginTop:'40%'}}>
                         <Input
                             placeholder="Enter Username...."
-                            leftIcon={{ type: 'font-awesome-5', name: 'envelope', color: '#11cbd7'}}
+                            leftIcon={{ type: 'font-awesome-5', name: 'at', color: '#11cbd7'}}
                             leftIconContainerStyle={{marginRight: 10}}
                             onChangeText={(userName) => this.setState({userName})}
                             value={this.state.userName}

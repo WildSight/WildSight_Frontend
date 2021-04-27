@@ -30,10 +30,10 @@ export const updateUserProfile = (userDetails)=> async(dispatch, getState)=>{
     }
 }
 
-export const fetchUserSightings = (userDetails)=> async(dispatch, getState)=>{
-    const token = userDetails.token;
+export const fetchUserSightings = (details)=> async(dispatch, getState)=>{
+    const {token,limit, skip} = details;
     try{
-        const response = await authRecord(token).get('auth/GetOwnSightings')
+        const response = await authRecord(token).get('auth/GetOwnSightings',{params:{num:limit, skip}})
         dispatch({type:GET_USER_SIGHTINGS, payload: response.data});
 
     }catch(e){

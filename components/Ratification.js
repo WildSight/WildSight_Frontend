@@ -216,7 +216,7 @@ class Ratification extends Component {
                         ListFooterComponent={this.renderFooter}
                         refreshing={this.state.refreshing}
                         onEndReached={this.retrieveData}
-                        onEndReachedThreshold={0}
+                        onEndReachedThreshold={0.1}
                         /> 
                         <BottomSheet isVisible={this.state.sheetVisible} >
                                 <View style={{flex: 1, backgroundColor: 'white'}}>

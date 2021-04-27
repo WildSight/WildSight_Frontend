@@ -18,7 +18,8 @@ class Profile extends Component {
             latitude: 30.73629,
             longitude:  76.7884,
             refreshing: false,
-            isCompleted: false
+            isCompleted: false,
+            count:0
         }
     }
 
@@ -37,7 +38,7 @@ class Profile extends Component {
             refreshing:true
         })
         try{
-            await this.props.fetchUserSightings({token:authToken})
+            await this.props.fetchUserSightings({token:authToken, limit:this.state.limit, skip:this.state.skip+1})
             let userSightings = this.props.UserSightings.data;
             if(userSightings.length==0){
                 this.setState({
@@ -47,8 +48,9 @@ class Profile extends Component {
                 return null;
             }
             let data = []
+            let count = this.state.count+1;
             for(var i=0;i<userSightings.length;i++){
-            let temporary_id=i;
+            let temporary_id=count+i;
             let sighting = userSightings[i];
             let common_name;
             if(userSightings[i].species){
@@ -59,17 +61,16 @@ class Profile extends Component {
             }
             
             let obj = {...sighting, temporary_id, common_name}
+            count = count + data.length;
             data.push(obj);
             }
             var prevData = this.state.userSightings;
-            console.log(prevData);
-            console.log("data", data)
             const resData = prevData.concat(data)
-            console.log("resutant", resData)
             this.setState({
                 userSightings:resData,
                 skip:this.state.skip+1,
-                refreshing:false
+                refreshing:false,
+                count
             })
 
         }catch(e){
@@ -153,7 +154,7 @@ class Profile extends Component {
                     ListFooterComponent={this.renderFooter}
                     refreshing={this.state.refreshing}
                     onEndReached={this.retrieveData}
-                    onEndReachedThreshold={0}
+                    onEndReachedThreshold={0.000000001}
                 />
 
             )
