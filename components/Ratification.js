@@ -207,16 +207,16 @@ class Ratification extends Component {
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                       <View style={{height:'100%', backgroundColor: "#000000aa"}}>
                         <FlatList
-                        data={this.state.data}
-                        renderItem={this.renderCardTempelate}
-                        keyExtractor={item =>{
-                        return item.id.toString()}
-                        }
-                        style={{marginBottom: 30}}
-                        ListFooterComponent={this.renderFooter}
-                        refreshing={this.state.refreshing}
-                        onEndReached={this.retrieveData}
-                        onEndReachedThreshold={0.1}
+                          data={this.state.data}
+                          renderItem={this.renderCardTempelate}
+                          keyExtractor={item =>{
+                          return item.id.toString()}
+                          }
+                          style={{marginBottom: 30}}
+                          ListFooterComponent={this.renderFooter}
+                          refreshing={this.state.refreshing}
+                          onEndReached={this.retrieveData}
+                          onEndReachedThreshold={0.1}
                         /> 
                         <BottomSheet isVisible={this.state.sheetVisible} >
                                 <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -262,7 +262,7 @@ class Ratification extends Component {
             <View style={styles.container}>
                 <ImageBackground source={require('./images/wild2.png')} style={styles.image}>
                       <View style={{height:'100%', backgroundColor: "#000000aa"}}>
-                        <Text style={{marginTop:'50%', fontSize:35, textAlign:'center'}}>Fetching sightings<ActivityIndicator size="large" animating={true} color="#125112"/></Text>
+                        <Text style={{marginTop:'50%', fontSize:35, textAlign:'center', color: 'white'}}>Fetching sightings<ActivityIndicator size="large" animating={true} color="yellow"/></Text>
                       </View>
                 </ImageBackground>
             </View>

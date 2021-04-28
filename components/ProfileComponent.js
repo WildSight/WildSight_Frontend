@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {ActivityIndicator, FlatList, View, Image, ImageBackground, Text, StyleSheet, ScrollView} from 'react-native';
+import {ActivityIndicator, RefreshControl, FlatList, View, Image, Dimensions, ImageBackground, Text, StyleSheet, ScrollView} from 'react-native';
 import { ListItem, Icon, BottomSheet, Button, Card, Avatar} from 'react-native-elements';
+import MapView, {Marker} from 'react-native-maps';
 import {getUserProfile, fetchUserSightings} from '../redux/actions/user'
 
 import {fetchBird} from '../redux/actions/bird';
 import { SafeAreaView } from 'react-native';
-//import { ScrollView } from 'react-native-gesture-handler';
+
 class Profile extends Component {
     constructor(props){
         super(props);
@@ -88,7 +89,7 @@ class Profile extends Component {
             <ListItem
                 key={index}
                 containerStyle={{
-                    backgroundColor: "#51adcf",
+                    backgroundColor: '#8fd6e1',
                     height: "auto", borderRadius: 25, borderColor: 'grey', borderWidth: 2, marginHorizontal: '3%', 
                     marginTop: '3%', marginBottom: '2%'}}
                 pad = {30}
@@ -97,17 +98,17 @@ class Profile extends Component {
                  (<Avatar rounded size={'large'} source={require("./images/Logo.png")} icon={{name: 'user', type: 'font-awesome'}}/>)
                 }
                 <ListItem.Content>
-                    <ListItem.Title style={{fontWeight: 'bold', color: '#fff', marginBottom:5}}>
+                    <ListItem.Title style={{fontWeight: 'bold', color: '#4b778d', marginBottom:5}}>
                         <Icon name='feather'
                                     type="font-awesome-5" 
-                                    color='white'
+                                    color='#4b778d'
                                     size={15}
                                     iconStyle={{marginRight: 10}} />{item.common_name}
                     </ListItem.Title>
-                    <ListItem.Subtitle style={{fontWeight: 'bold', color: '#fff', marginBottom:5}}>
+                    <ListItem.Subtitle style={{fontWeight: 'bold', color: '#4b778d', marginBottom:5}}>
                         <Icon name='eye'
                             type="font-awesome-5" 
-                            color='white'
+                            color='#4b778d'
                             size={15}
                             iconStyle={{marginRight: 10}} />{item.count}
                     </ListItem.Subtitle>
@@ -116,13 +117,13 @@ class Profile extends Component {
                       sheetVisible: !this.state.sheetVisible,
                       latitude: parseFloat(item.location_latitude),
                       longitude: parseFloat(item.location_longitude)
-                    })} style={{ fontWeight: 'bold', color: '#fff', marginBottom:5}}>
+                    })} style={{ fontWeight: 'bold', color: '#4b778d', marginBottom:5}}>
                         <Icon name='map-marker-alt' type="font-awesome-5"  color='#4b778d' size={15}
                             iconStyle={{marginRight: 10}} />{item.location_latitude +", "+ item.location_longitude}
                     </ListItem.Subtitle>
                     
-                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#eee', marginBottom:5}}>
-                        <Icon name='calendar-alt' type="font-awesome-5"  color='#eee' size={15}
+                    <ListItem.Subtitle style={{ fontWeight: 'bold', color: '#4b778d', marginBottom:5}}>
+                        <Icon name='calendar-alt' type="font-awesome-5"  color='#4b778d' size={15}
                             iconStyle={{marginRight: 10}} />
                             {new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'long', year: 'numeric', hour:'numeric', minute:'numeric'}).format(new Date(Date.parse(item.date_time)))}
                     </ListItem.Subtitle>
@@ -160,13 +161,16 @@ class Profile extends Component {
             )
         }
         return(
-            <Text style={{marginTop:'10%', fontSize:30, textAlign:'center'}}>Loading User Sightings <ActivityIndicator 
-                size='large' animating={true} color="#125112"/>
+            <Text style={{marginTop:'10%', fontSize:30, textAlign:'center', color: 'white'}}>Loading User Sightings <ActivityIndicator 
+                size='large' animating={true} color="yellow"/>
             </Text>
         )
     }
 
     render() {
+
+        let screenHeight = 2*Dimensions.get('window').height;
+
         if(this.props.UserProfile.data){
             const user = this.props.UserProfile.data;
         return (
@@ -208,13 +212,47 @@ class Profile extends Component {
 
                     <View style={{ justifyContent:'space-between'}}>
                         <Button
-                        onPress={() => this.props.navigation.navigate('UPDATE PROFILE')}
-                        icon={<Icon name='user-alt' type="font-awesome-5"  color='white' iconStyle={{marginRight:10}}/>}
-                        buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 5}}
-                        title='Update profile' />
+                            onPress={() => this.props.navigation.navigate('UPDATE PROFILE')}
+                            icon={<Icon name='user-alt' type="font-awesome-5"  color='white' iconStyle={{marginRight:10}}/>}
+                            buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 5}}
+                            title='Update profile' />
                     </View>
                 </Card>
                     {this.getSightingsList()}
+                    <BottomSheet isVisible={this.state.sheetVisible} >
+                        <View style={{flex: 1, backgroundColor: 'white'}}>
+                        <Text style={{textAlign: 'right', marginBottom: '0%'}}>
+                            <Icon 
+                                name='times-circle'
+                                type='font-awesome-5' 
+                                onPress={() => this.setState({sheetVisible: false})}
+                                size={30}
+                                />
+                            </Text>
+                        <MapView 
+                            region={{
+                                latitude: this.state.latitude,
+                                longitude: this.state.longitude,
+                                latitudeDelta: 0.005,
+                                longitudeDelta: 0.005
+                            }}
+                            style={{height: screenHeight-500, width: Dimensions.get('window').width}}
+                        >
+                            {this.state.latitude && this.state.longitude
+                            ?
+                            <Marker 
+                                coordinate={{
+                                    latitude: this.state.latitude,
+                                    longitude: this.state.longitude
+                                }}
+                                title={'Desired Location'}
+                            />
+                            :
+                            <View></View>
+                            }
+                        </MapView>
+                        </View>
+                    </BottomSheet>
                 <View>
                     
                 </View>

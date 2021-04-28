@@ -113,10 +113,12 @@ class AddSighting extends Component {
             await this.props.getCustomGrid(this.state.latitude.toString(), this.state.longitude.toString());
             
             let grid = this.props.grids.grids[0];
-            
-            await this.props.getCustomSpeciesLocationSightings(grid.id, Moment(this.state.date).format('M'), this.state.birdId);
-
-            var sightings = this.props.sightings.sightings[0];
+            var sightings = null;
+            if(grid && grid.id)
+            {
+                await this.props.getCustomSpeciesLocationSightings(grid.id, Moment(this.state.date).format('M'), this.state.birdId);
+                sightings = this.props.sightings.sightings[0];
+            }    
 
             var rawSighting = {};
 
