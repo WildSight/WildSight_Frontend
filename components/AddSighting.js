@@ -138,6 +138,7 @@ class AddSighting extends Component {
                     rawSighting.credible = false; 
             } 
             
+            credibilityError = credibilityError.toFixed(4);
             var credibilityScore = 100*(1-credibilityError);
             ToastAndroid.show("Current Credibilty Score of sighting: "+credibilityScore.toString()+"%", ToastAndroid.LONG);
 
@@ -395,6 +396,7 @@ class AddSighting extends Component {
                                 }}>
                         <DatePicker
                             defaultDate={new Date()}
+                            maximumDate={new Date()}
                             locale={"en"}
                             timeZoneOffsetInMinutes={undefined}
                             modalTransparent={false}
